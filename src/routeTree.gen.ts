@@ -11,10 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReceberRouteImport } from './routes/receber'
+import { Route as ParceiroRouteImport } from './routes/parceiro'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LinkRouteImport } from './routes/link'
 import { Route as ExtratoRouteImport } from './routes/extrato'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ParceiroPromotoresRouteImport } from './routes/parceiro.promotores'
+import { Route as ParceiroPagamentosRouteImport } from './routes/parceiro.pagamentos'
+import { Route as ParceiroDepositosRouteImport } from './routes/parceiro.depositos'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -24,6 +28,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ReceberRoute = ReceberRouteImport.update({
   id: '/receber',
   path: '/receber',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParceiroRoute = ParceiroRouteImport.update({
+  id: '/parceiro',
+  path: '/parceiro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -46,22 +55,45 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParceiroPromotoresRoute = ParceiroPromotoresRouteImport.update({
+  id: '/promotores',
+  path: '/promotores',
+  getParentRoute: () => ParceiroRoute,
+} as any)
+const ParceiroPagamentosRoute = ParceiroPagamentosRouteImport.update({
+  id: '/pagamentos',
+  path: '/pagamentos',
+  getParentRoute: () => ParceiroRoute,
+} as any)
+const ParceiroDepositosRoute = ParceiroDepositosRouteImport.update({
+  id: '/depositos',
+  path: '/depositos',
+  getParentRoute: () => ParceiroRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/extrato': typeof ExtratoRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
+  '/parceiro': typeof ParceiroRouteWithChildren
   '/receber': typeof ReceberRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/parceiro/depositos': typeof ParceiroDepositosRoute
+  '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/extrato': typeof ExtratoRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
+  '/parceiro': typeof ParceiroRouteWithChildren
   '/receber': typeof ReceberRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/parceiro/depositos': typeof ParceiroDepositosRoute
+  '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,8 +101,12 @@ export interface FileRoutesById {
   '/extrato': typeof ExtratoRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
+  '/parceiro': typeof ParceiroRouteWithChildren
   '/receber': typeof ReceberRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/parceiro/depositos': typeof ParceiroDepositosRoute
+  '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -79,18 +115,36 @@ export interface FileRouteTypes {
     | '/extrato'
     | '/link'
     | '/onboarding'
+    | '/parceiro'
     | '/receber'
     | '/sitemap.xml'
+    | '/parceiro/depositos'
+    | '/parceiro/pagamentos'
+    | '/parceiro/promotores'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/extrato' | '/link' | '/onboarding' | '/receber' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/extrato'
+    | '/link'
+    | '/onboarding'
+    | '/parceiro'
+    | '/receber'
+    | '/sitemap.xml'
+    | '/parceiro/depositos'
+    | '/parceiro/pagamentos'
+    | '/parceiro/promotores'
   id:
     | '__root__'
     | '/'
     | '/extrato'
     | '/link'
     | '/onboarding'
+    | '/parceiro'
     | '/receber'
     | '/sitemap.xml'
+    | '/parceiro/depositos'
+    | '/parceiro/pagamentos'
+    | '/parceiro/promotores'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -98,6 +152,7 @@ export interface RootRouteChildren {
   ExtratoRoute: typeof ExtratoRoute
   LinkRoute: typeof LinkRoute
   OnboardingRoute: typeof OnboardingRoute
+  ParceiroRoute: typeof ParceiroRouteWithChildren
   ReceberRoute: typeof ReceberRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
@@ -116,6 +171,13 @@ declare module '@tanstack/react-router' {
       path: '/receber'
       fullPath: '/receber'
       preLoaderRoute: typeof ReceberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parceiro': {
+      id: '/parceiro'
+      path: '/parceiro'
+      fullPath: '/parceiro'
+      preLoaderRoute: typeof ParceiroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -146,14 +208,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/parceiro/promotores': {
+      id: '/parceiro/promotores'
+      path: '/promotores'
+      fullPath: '/parceiro/promotores'
+      preLoaderRoute: typeof ParceiroPromotoresRouteImport
+      parentRoute: typeof ParceiroRoute
+    }
+    '/parceiro/pagamentos': {
+      id: '/parceiro/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/parceiro/pagamentos'
+      preLoaderRoute: typeof ParceiroPagamentosRouteImport
+      parentRoute: typeof ParceiroRoute
+    }
+    '/parceiro/depositos': {
+      id: '/parceiro/depositos'
+      path: '/depositos'
+      fullPath: '/parceiro/depositos'
+      preLoaderRoute: typeof ParceiroDepositosRouteImport
+      parentRoute: typeof ParceiroRoute
+    }
   }
 }
+
+interface ParceiroRouteChildren {
+  ParceiroDepositosRoute: typeof ParceiroDepositosRoute
+  ParceiroPagamentosRoute: typeof ParceiroPagamentosRoute
+  ParceiroPromotoresRoute: typeof ParceiroPromotoresRoute
+}
+
+const ParceiroRouteChildren: ParceiroRouteChildren = {
+  ParceiroDepositosRoute: ParceiroDepositosRoute,
+  ParceiroPagamentosRoute: ParceiroPagamentosRoute,
+  ParceiroPromotoresRoute: ParceiroPromotoresRoute,
+}
+
+const ParceiroRouteWithChildren = ParceiroRoute._addFileChildren(
+  ParceiroRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExtratoRoute: ExtratoRoute,
   LinkRoute: LinkRoute,
   OnboardingRoute: OnboardingRoute,
+  ParceiroRoute: ParceiroRouteWithChildren,
   ReceberRoute: ReceberRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
