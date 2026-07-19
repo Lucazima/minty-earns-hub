@@ -20,6 +20,8 @@ function Pagamentos() {
   const eligible = promoters.filter((p) => p.status !== "pausado");
   const [selected, setSelected] = useState<Set<string>>(new Set(eligible.map((p) => p.id)));
   const [confirmed, setConfirmed] = useState(false);
+  const [disputeFor, setDisputeFor] = useState<string | null>(null);
+  const [disputeNote, setDisputeNote] = useState("");
 
   const toggle = (id: string) => {
     setSelected((prev) => {
