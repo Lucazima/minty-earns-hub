@@ -59,6 +59,7 @@ function Depositos() {
     a.download = `depositos_promotores_${period}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success("Relatório exportado", { description: `${rows.length} promotores · ${periodLabel[period]}` });
   };
 
   return (
