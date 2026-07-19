@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, ArrowUpDown, CheckCircle2, PauseCircle, AlertTriangle } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowUpDown, CheckCircle2, PauseCircle, AlertTriangle, X, ChevronRight } from "lucide-react";
 import { PartnerShell } from "@/components/PartnerShell";
 import { promoters, brl, tierClass, statusClass, statusLabel, type Promoter } from "@/lib/partnerData";
 
