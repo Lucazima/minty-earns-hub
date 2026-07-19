@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck } from "lucide-react";
+import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck, Building2 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 
 
