@@ -103,9 +103,19 @@ function Promotores() {
               ]}
             />
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Mostrando <span className="font-medium text-foreground">{rows.length}</span> de {promoters.length} promotores.
-          </p>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs text-muted-foreground">
+              Mostrando <span className="font-medium text-foreground">{rows.length}</span> de {promoters.length} promotores.
+            </p>
+            {(q || tier !== "todos" || status !== "todos") && (
+              <button
+                onClick={() => { setQ(""); setTier("todos"); setStatus("todos"); }}
+                className="inline-flex items-center gap-1 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+              >
+                <X className="h-3 w-3" strokeWidth={2.5} /> Limpar filtros
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Table (desktop) */}
