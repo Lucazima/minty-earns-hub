@@ -179,19 +179,25 @@ function Promotores() {
         {/* Cards (mobile) */}
         <ul className="space-y-3 md:hidden">
           {rows.map((p) => (
-            <li key={p.id} className="surface-card p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-foreground">{p.name}</p>
-                  <p className="text-xs text-muted-foreground">{p.handle}</p>
+            <li key={p.id}>
+              <Link
+                to="/parceiro/promotores/$id"
+                params={{ id: p.id }}
+                className="surface-card block p-4 transition active:scale-[0.99]"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-foreground">{p.name}</p>
+                    <p className="text-xs text-muted-foreground">{p.handle}</p>
+                  </div>
+                  <StatusPill status={p.status} />
                 </div>
-                <StatusPill status={p.status} />
-              </div>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                <Stat label="Indicações" value={String(p.referred)} />
-                <Stat label="Depósitos" value={brl(p.depositsMTD)} />
-                <Stat label="Comissão" value={brl(p.commissionDue)} accent />
-              </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <Stat label="Indicações" value={String(p.referred)} />
+                  <Stat label="Depósitos" value={brl(p.depositsMTD)} />
+                  <Stat label="Comissão" value={brl(p.commissionDue)} accent />
+                </div>
+              </Link>
             </li>
           ))}
         </ul>
