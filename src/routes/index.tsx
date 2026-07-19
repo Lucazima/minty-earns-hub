@@ -47,10 +47,14 @@ function Dashboard() {
           <div className="relative">
             <div className="flex items-center justify-between">
               <span className="eyebrow">Seus ganhos neste mês</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">
-                <TrendingUp className="h-3 w-3" strokeWidth={2.5} /> +18%
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">
+                  <TrendingUp className="h-3 w-3" strokeWidth={2.5} /> +18%
+                </span>
+                <span className="hidden text-xs text-muted-foreground sm:inline">vs. mês passado</span>
+              </div>
             </div>
+
 
             <div className="mt-5 flex items-baseline gap-2">
               <span className="font-display text-5xl font-bold text-primary md:text-7xl">
