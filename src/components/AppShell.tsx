@@ -1,6 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, LinkIcon, Receipt, Wallet, Sparkles } from "lucide-react";
+import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck } from "lucide-react";
+import { useApp } from "@/context/AppContext";
+
 
 const nav = [
   { to: "/", label: "Painel", icon: Home },
