@@ -167,7 +167,11 @@ function Pagamentos() {
               </div>
 
               <button
-                onClick={() => selected.size > 0 && setConfirmed(true)}
+                onClick={() => {
+                  if (selected.size === 0) return;
+                  setConfirmed(true);
+                  toast.success("Repasse confirmado", { description: `${brl(total)} · ${selected.size} promotores` });
+                }}
                 disabled={selected.size === 0}
                 className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
               >
