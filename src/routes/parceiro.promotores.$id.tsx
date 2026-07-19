@@ -43,7 +43,7 @@ export const Route = createFileRoute("/parceiro/promotores/$id")({
 });
 
 function PromoterDetail() {
-  const { promoter } = Route.useLoaderData();
+  const { promoter } = Route.useLoaderData() as { promoter: Promoter };
   const router = useRouter();
   const [status, setStatus] = useState<Promoter["status"]>(promoter.status);
   const history = depositsHistory(promoter);
