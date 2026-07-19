@@ -1,12 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LayoutDashboard, Users, LineChart, FileCheck2, ShieldCheck, Building2 } from "lucide-react";
+import { LayoutDashboard, Users, LineChart, FileCheck2, ShieldCheck, Building2, ArrowLeftRight } from "lucide-react";
 
 const nav = [
-  { to: "/parceiro", label: "Visão geral", icon: LayoutDashboard },
-  { to: "/parceiro/promotores", label: "Promotores", icon: Users },
-  { to: "/parceiro/depositos", label: "Depósitos", icon: LineChart },
-  { to: "/parceiro/pagamentos", label: "Pagamentos", icon: FileCheck2 },
+  { to: "/parceiro", label: "Visão geral", shortLabel: "Visão", icon: LayoutDashboard },
+  { to: "/parceiro/promotores", label: "Promotores", shortLabel: "Rede", icon: Users },
+  { to: "/parceiro/depositos", label: "Depósitos", shortLabel: "Depósitos", icon: LineChart },
+  { to: "/parceiro/pagamentos", label: "Pagamentos", shortLabel: "Pagar", icon: FileCheck2 },
 ] as const;
 
 export function PartnerShell({ children }: { children: ReactNode }) {
