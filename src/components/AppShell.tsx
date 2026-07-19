@@ -13,6 +13,7 @@ const nav = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { theme, toggleTheme, isNewPromoter, setIsNewPromoter } = useApp();
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,17 +26,33 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
             <span className="font-display text-lg font-bold tracking-tight">PalazeHub</span>
           </Link>
-          <div className="hidden items-center gap-3 md:flex">
-            <div className="flex items-center gap-2 rounded-full border border-border/60 bg-surface/50 px-3 py-1.5">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="hidden items-center gap-2 rounded-full border border-border/60 bg-surface/50 px-3 py-1.5 md:flex">
               <div className="h-2 w-2 rounded-full bg-primary pulse-mint" />
               <span className="text-xs text-muted-foreground">Você está online</span>
             </div>
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-secondary/20 text-sm font-semibold text-secondary">
+            <button
+              onClick={() => setIsNewPromoter(!isNewPromoter)}
+              title={isNewPromoter ? "Ver como promotor com histórico" : "Ver como novo promotor"}
+              aria-label="Alternar demo de novo promotor"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface/50 text-muted-foreground transition hover:text-foreground"
+            >
+              {isNewPromoter ? <UserPlus className="h-4 w-4" strokeWidth={2} /> : <UserCheck className="h-4 w-4" strokeWidth={2} />}
+            </button>
+            <button
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+              className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface/50 text-muted-foreground transition hover:text-foreground"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" strokeWidth={2} /> : <Moon className="h-4 w-4" strokeWidth={2} />}
+            </button>
+            <div className="hidden h-9 w-9 place-items-center rounded-full bg-secondary/20 text-sm font-semibold text-secondary md:grid">
               M
             </div>
           </div>
         </div>
       </header>
+
 
       <div className="mx-auto flex max-w-6xl gap-8 px-5 pt-6 md:px-8">
         {/* Sidebar (desktop) */}
