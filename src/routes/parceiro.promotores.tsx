@@ -130,11 +130,17 @@ function Promotores() {
                 <th className="px-5 py-3 text-right font-medium">Jogadores ativos</th>
                 <th className="px-5 py-3 text-right font-medium">Depósitos (mês)</th>
                 <th className="px-5 py-3 text-right font-medium">Comissão devida</th>
+                <th className="px-5 py-3 text-right font-medium">Comissão devida</th>
+                <th className="w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
               {rows.map((p) => (
-                <tr key={p.id} className="transition hover:bg-surface-elevated/40">
+                <tr
+                  key={p.id}
+                  onClick={() => { window.location.href = `/parceiro/promotores/${p.id}`; }}
+                  className="cursor-pointer transition hover:bg-surface-elevated/40"
+                >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="grid h-9 w-9 place-items-center rounded-full bg-secondary/15 text-xs font-semibold text-secondary">
