@@ -164,6 +164,7 @@ function Promotores() {
                   <td className="px-5 py-4 text-right tabular text-muted-foreground">{p.activePlayers}</td>
                   <td className="px-5 py-4 text-right font-medium tabular">{brl(p.depositsMTD)}</td>
                   <td className="px-5 py-4 text-right font-semibold tabular text-primary">{brl(p.commissionDue)}</td>
+                  <td className="pr-4 text-muted-foreground"><ChevronRight className="h-4 w-4" strokeWidth={2} /></td>
                 </tr>
               ))}
             </tbody>
