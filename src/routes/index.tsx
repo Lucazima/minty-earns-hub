@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight, TrendingUp, Users, Wallet, Sparkles } from "lucide-react";
+import { ArrowUpRight, TrendingUp, Users, Wallet, Sparkles, Share2, Rocket } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CountUp } from "@/components/CountUp";
+import { useApp } from "@/context/AppContext";
 
 export const Route = createFileRoute("/")({
+
   head: () => ({
     meta: [
       { title: "Painel — PalazeHub" },
