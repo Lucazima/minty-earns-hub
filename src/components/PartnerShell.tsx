@@ -26,6 +26,13 @@ export function PartnerShell({ children }: { children: ReactNode }) {
             </div>
           </Link>
           <div className="hidden items-center gap-3 md:flex">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-surface/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5" strokeWidth={2} />
+              Ver como promotor
+            </Link>
             <div className="flex items-center gap-2 rounded-full border border-border/60 bg-surface/50 px-3 py-1.5">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
               <span className="text-xs text-muted-foreground">Conta verificada · <span className="text-foreground">BetSul</span></span>
