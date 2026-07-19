@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CheckCircle2, ShieldCheck, Lock, FileText, ArrowRight } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Lock, FileText, ArrowRight, MessageSquareWarning } from "lucide-react";
+import { toast } from "sonner";
 import { PartnerShell } from "@/components/PartnerShell";
 import { promoters, brl } from "@/lib/partnerData";
 
