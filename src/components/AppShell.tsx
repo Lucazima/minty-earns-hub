@@ -39,6 +39,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               {isNewPromoter ? <UserPlus className="h-4 w-4" strokeWidth={2} /> : <UserCheck className="h-4 w-4" strokeWidth={2} />}
             </button>
+            <Link
+              to="/parceiro"
+              title="Portal da operadora"
+              className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-surface/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground sm:inline-flex"
+            >
+              <Building2 className="h-3.5 w-3.5" strokeWidth={2} />
+              Portal da operadora
+            </Link>
             <button
               onClick={toggleTheme}
               aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
