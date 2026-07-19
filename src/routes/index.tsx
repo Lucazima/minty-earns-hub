@@ -179,3 +179,84 @@ function MetricCard({
     </div>
   );
 }
+
+function EmptyDashboard() {
+  const steps = [
+    { n: 1, title: "Copie seu link", body: "Ele é só seu — quem entra por ele fica atrelado à sua conta." },
+    { n: 2, title: "Compartilhe onde tiver gente", body: "WhatsApp, Instagram, grupos. Um envio já vale." },
+    { n: 3, title: "Comece a ganhar", body: "Toda vez que alguém deposita, uma parte é sua. Sem cálculo." },
+  ];
+  return (
+    <AppShell>
+      <div className="space-y-8">
+        <div>
+          <p className="eyebrow">Bem-vinda, Marina</p>
+          <h1 className="font-display mt-1 text-3xl font-bold tracking-tight md:text-4xl">
+            Vamos fazer os primeiros ganhos.
+          </h1>
+        </div>
+
+        <section className="hero-card relative p-6 md:p-10">
+          <div className="hero-glow" />
+          <div className="relative">
+            <div className="flex items-center gap-2">
+              <Rocket className="h-4 w-4 text-primary" strokeWidth={2.5} />
+              <span className="eyebrow !text-primary">Sua jornada começa aqui</span>
+            </div>
+            <h2 className="font-display mt-4 text-3xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
+              Seus primeiros ganhos<br className="hidden md:block" /> aparecem aqui.
+            </h2>
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-muted-foreground">
+              Ainda tá zerado — mas em poucos minutos isso muda. É só compartilhar seu link uma vez pra ver o painel ganhar vida.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/link"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.98]"
+              >
+                <Share2 className="h-4 w-4" strokeWidth={2.5} />
+                Compartilhar meu link
+              </Link>
+              <Link
+                to="/onboarding"
+                className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface/60 px-5 py-3 text-sm font-medium text-foreground transition hover:bg-surface"
+              >
+                Como funciona?
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {steps.map((s) => (
+            <div key={s.n} className="surface-card p-5">
+              <div className="flex items-center gap-3">
+                <span className="font-display grid h-9 w-9 place-items-center rounded-lg bg-secondary/15 text-sm font-bold text-secondary tabular">
+                  {s.n}
+                </span>
+                <h3 className="font-display text-base font-semibold text-foreground">{s.title}</h3>
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">{s.body}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {[
+            { label: "Pessoas indicadas", hint: "Convide a primeira." },
+            { label: "Depósitos gerados", hint: "Nenhum ainda." },
+            { label: "Disponível para saque", hint: "Chegando em breve." },
+          ].map((m) => (
+            <div key={m.label} className="surface-card p-5">
+              <span className="eyebrow">{m.label}</span>
+              <div className="font-display mt-4 text-3xl font-bold tabular text-muted-foreground/60">—</div>
+              <p className="mt-1.5 text-xs text-muted-foreground">{m.hint}</p>
+            </div>
+          ))}
+        </section>
+      </div>
+    </AppShell>
+  );
+}
+
