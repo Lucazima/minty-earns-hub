@@ -74,10 +74,10 @@ export function PartnerShell({ children }: { children: ReactNode }) {
         <main className="min-w-0 flex-1 pb-24">{children}</main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
         <div className="mx-auto grid max-w-md grid-cols-4 px-2 py-2">
           {nav.map((item) => {
-            const active = pathname === item.to;
+            const active = pathname === item.to || (item.to === "/parceiro/promotores" && pathname.startsWith("/parceiro/promotores"));
             const Icon = item.icon;
             return (
               <Link
@@ -88,7 +88,7 @@ export function PartnerShell({ children }: { children: ReactNode }) {
                 }`}
               >
                 <Icon className="h-5 w-5" strokeWidth={2} />
-                {item.label}
+                {item.shortLabel}
               </Link>
             );
           })}
