@@ -1,12 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LayoutDashboard, Users, LineChart, FileCheck2, ShieldCheck, Building2 } from "lucide-react";
+import { LayoutDashboard, Users, LineChart, FileCheck2, ShieldCheck, Building2, ArrowLeftRight } from "lucide-react";
 
 const nav = [
-  { to: "/parceiro", label: "Visão geral", icon: LayoutDashboard },
-  { to: "/parceiro/promotores", label: "Promotores", icon: Users },
-  { to: "/parceiro/depositos", label: "Depósitos", icon: LineChart },
-  { to: "/parceiro/pagamentos", label: "Pagamentos", icon: FileCheck2 },
+  { to: "/parceiro", label: "Visão geral", shortLabel: "Visão", icon: LayoutDashboard },
+  { to: "/parceiro/promotores", label: "Promotores", shortLabel: "Rede", icon: Users },
+  { to: "/parceiro/depositos", label: "Depósitos", shortLabel: "Depósitos", icon: LineChart },
+  { to: "/parceiro/pagamentos", label: "Pagamentos", shortLabel: "Pagar", icon: FileCheck2 },
 ] as const;
 
 export function PartnerShell({ children }: { children: ReactNode }) {
@@ -26,6 +26,13 @@ export function PartnerShell({ children }: { children: ReactNode }) {
             </div>
           </Link>
           <div className="hidden items-center gap-3 md:flex">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-surface/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5" strokeWidth={2} />
+              Ver como promotor
+            </Link>
             <div className="flex items-center gap-2 rounded-full border border-border/60 bg-surface/50 px-3 py-1.5">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
               <span className="text-xs text-muted-foreground">Conta verificada · <span className="text-foreground">BetSul</span></span>
@@ -67,10 +74,10 @@ export function PartnerShell({ children }: { children: ReactNode }) {
         <main className="min-w-0 flex-1 pb-24">{children}</main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
         <div className="mx-auto grid max-w-md grid-cols-4 px-2 py-2">
           {nav.map((item) => {
-            const active = pathname === item.to;
+            const active = pathname === item.to || (item.to === "/parceiro/promotores" && pathname.startsWith("/parceiro/promotores"));
             const Icon = item.icon;
             return (
               <Link
@@ -81,7 +88,7 @@ export function PartnerShell({ children }: { children: ReactNode }) {
                 }`}
               >
                 <Icon className="h-5 w-5" strokeWidth={2} />
-                {item.label}
+                {item.shortLabel}
               </Link>
             );
           })}

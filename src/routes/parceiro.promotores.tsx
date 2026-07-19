@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, ArrowUpDown, CheckCircle2, PauseCircle, AlertTriangle } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowUpDown, CheckCircle2, PauseCircle, AlertTriangle, X, ChevronRight } from "lucide-react";
 import { PartnerShell } from "@/components/PartnerShell";
 import { promoters, brl, tierClass, statusClass, statusLabel, type Promoter } from "@/lib/partnerData";
 
@@ -103,9 +103,19 @@ function Promotores() {
               ]}
             />
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Mostrando <span className="font-medium text-foreground">{rows.length}</span> de {promoters.length} promotores.
-          </p>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs text-muted-foreground">
+              Mostrando <span className="font-medium text-foreground">{rows.length}</span> de {promoters.length} promotores.
+            </p>
+            {(q || tier !== "todos" || status !== "todos") && (
+              <button
+                onClick={() => { setQ(""); setTier("todos"); setStatus("todos"); }}
+                className="inline-flex items-center gap-1 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+              >
+                <X className="h-3 w-3" strokeWidth={2.5} /> Limpar filtros
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Table (desktop) */}
@@ -120,11 +130,17 @@ function Promotores() {
                 <th className="px-5 py-3 text-right font-medium">Jogadores ativos</th>
                 <th className="px-5 py-3 text-right font-medium">Depósitos (mês)</th>
                 <th className="px-5 py-3 text-right font-medium">Comissão devida</th>
+                <th className="px-5 py-3 text-right font-medium">Comissão devida</th>
+                <th className="w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
               {rows.map((p) => (
-                <tr key={p.id} className="transition hover:bg-surface-elevated/40">
+                <tr
+                  key={p.id}
+                  onClick={() => { window.location.href = `/parceiro/promotores/${p.id}`; }}
+                  className="cursor-pointer transition hover:bg-surface-elevated/40"
+                >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="grid h-9 w-9 place-items-center rounded-full bg-secondary/15 text-xs font-semibold text-secondary">
@@ -148,6 +164,7 @@ function Promotores() {
                   <td className="px-5 py-4 text-right tabular text-muted-foreground">{p.activePlayers}</td>
                   <td className="px-5 py-4 text-right font-medium tabular">{brl(p.depositsMTD)}</td>
                   <td className="px-5 py-4 text-right font-semibold tabular text-primary">{brl(p.commissionDue)}</td>
+                  <td className="pr-4 text-muted-foreground"><ChevronRight className="h-4 w-4" strokeWidth={2} /></td>
                 </tr>
               ))}
             </tbody>
@@ -162,19 +179,25 @@ function Promotores() {
         {/* Cards (mobile) */}
         <ul className="space-y-3 md:hidden">
           {rows.map((p) => (
-            <li key={p.id} className="surface-card p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-foreground">{p.name}</p>
-                  <p className="text-xs text-muted-foreground">{p.handle}</p>
+            <li key={p.id}>
+              <Link
+                to="/parceiro/promotores/$id"
+                params={{ id: p.id }}
+                className="surface-card block p-4 transition active:scale-[0.99]"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-foreground">{p.name}</p>
+                    <p className="text-xs text-muted-foreground">{p.handle}</p>
+                  </div>
+                  <StatusPill status={p.status} />
                 </div>
-                <StatusPill status={p.status} />
-              </div>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                <Stat label="Indicações" value={String(p.referred)} />
-                <Stat label="Depósitos" value={brl(p.depositsMTD)} />
-                <Stat label="Comissão" value={brl(p.commissionDue)} accent />
-              </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <Stat label="Indicações" value={String(p.referred)} />
+                  <Stat label="Depósitos" value={brl(p.depositsMTD)} />
+                  <Stat label="Comissão" value={brl(p.commissionDue)} accent />
+                </div>
+              </Link>
             </li>
           ))}
         </ul>

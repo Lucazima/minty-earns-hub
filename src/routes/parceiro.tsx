@@ -114,24 +114,30 @@ function PartnerDashboard() {
           <ul className="mt-5 space-y-4">
             {top.map((p, i) => (
               <li key={p.id}>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-7 w-7 place-items-center rounded-md bg-surface-elevated text-xs font-semibold text-muted-foreground tabular">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">{p.handle} · {p.activePlayers} jogadores ativos</p>
+                <Link
+                  to="/parceiro/promotores/$id"
+                  params={{ id: p.id }}
+                  className="block rounded-xl p-2 -mx-2 transition hover:bg-surface-elevated/40"
+                >
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-7 w-7 place-items-center rounded-md bg-surface-elevated text-xs font-semibold text-muted-foreground tabular">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground">{p.name}</p>
+                        <p className="text-xs text-muted-foreground">{p.handle} · {p.activePlayers} jogadores ativos</p>
+                      </div>
                     </div>
+                    <span className="font-display shrink-0 text-sm font-semibold tabular">{brl(p.depositsMTD)}</span>
                   </div>
-                  <span className="font-display shrink-0 text-sm font-semibold tabular">{brl(p.depositsMTD)}</span>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-elevated">
-                  <div
-                    className="h-full rounded-full bg-primary/80"
-                    style={{ width: `${(p.depositsMTD / maxDep) * 100}%` }}
-                  />
-                </div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-elevated">
+                    <div
+                      className="h-full rounded-full bg-primary/80"
+                      style={{ width: `${(p.depositsMTD / maxDep) * 100}%` }}
+                    />
+                  </div>
+                </Link>
               </li>
             ))}
           </ul>

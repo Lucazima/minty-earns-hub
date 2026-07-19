@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Download, TrendingUp, TrendingDown } from "lucide-react";
+import { toast } from "sonner";
 import { PartnerShell } from "@/components/PartnerShell";
 import { promoters, brl } from "@/lib/partnerData";
 
@@ -58,6 +59,7 @@ function Depositos() {
     a.download = `depositos_promotores_${period}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success("Relatório exportado", { description: `${rows.length} promotores · ${periodLabel[period]}` });
   };
 
   return (

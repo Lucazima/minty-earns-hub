@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ParceiroPromotoresRouteImport } from './routes/parceiro.promotores'
 import { Route as ParceiroPagamentosRouteImport } from './routes/parceiro.pagamentos'
 import { Route as ParceiroDepositosRouteImport } from './routes/parceiro.depositos'
+import { Route as ParceiroPromotoresIdRouteImport } from './routes/parceiro.promotores.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -70,6 +71,11 @@ const ParceiroDepositosRoute = ParceiroDepositosRouteImport.update({
   path: '/depositos',
   getParentRoute: () => ParceiroRoute,
 } as any)
+const ParceiroPromotoresIdRoute = ParceiroPromotoresIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ParceiroPromotoresRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,7 +87,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
-  '/parceiro/promotores': typeof ParceiroPromotoresRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRouteWithChildren
+  '/parceiro/promotores/$id': typeof ParceiroPromotoresIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,7 +100,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
-  '/parceiro/promotores': typeof ParceiroPromotoresRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRouteWithChildren
+  '/parceiro/promotores/$id': typeof ParceiroPromotoresIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,7 +114,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
-  '/parceiro/promotores': typeof ParceiroPromotoresRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRouteWithChildren
+  '/parceiro/promotores/$id': typeof ParceiroPromotoresIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
     | '/parceiro/promotores'
+    | '/parceiro/promotores/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
     | '/parceiro/promotores'
+    | '/parceiro/promotores/$id'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
     | '/parceiro/promotores'
+    | '/parceiro/promotores/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,19 +241,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParceiroDepositosRouteImport
       parentRoute: typeof ParceiroRoute
     }
+    '/parceiro/promotores/$id': {
+      id: '/parceiro/promotores/$id'
+      path: '/$id'
+      fullPath: '/parceiro/promotores/$id'
+      preLoaderRoute: typeof ParceiroPromotoresIdRouteImport
+      parentRoute: typeof ParceiroPromotoresRoute
+    }
   }
 }
+
+interface ParceiroPromotoresRouteChildren {
+  ParceiroPromotoresIdRoute: typeof ParceiroPromotoresIdRoute
+}
+
+const ParceiroPromotoresRouteChildren: ParceiroPromotoresRouteChildren = {
+  ParceiroPromotoresIdRoute: ParceiroPromotoresIdRoute,
+}
+
+const ParceiroPromotoresRouteWithChildren =
+  ParceiroPromotoresRoute._addFileChildren(ParceiroPromotoresRouteChildren)
 
 interface ParceiroRouteChildren {
   ParceiroDepositosRoute: typeof ParceiroDepositosRoute
   ParceiroPagamentosRoute: typeof ParceiroPagamentosRoute
-  ParceiroPromotoresRoute: typeof ParceiroPromotoresRoute
+  ParceiroPromotoresRoute: typeof ParceiroPromotoresRouteWithChildren
 }
 
 const ParceiroRouteChildren: ParceiroRouteChildren = {
   ParceiroDepositosRoute: ParceiroDepositosRoute,
   ParceiroPagamentosRoute: ParceiroPagamentosRoute,
-  ParceiroPromotoresRoute: ParceiroPromotoresRoute,
+  ParceiroPromotoresRoute: ParceiroPromotoresRouteWithChildren,
 }
 
 const ParceiroRouteWithChildren = ParceiroRoute._addFileChildren(
@@ -260,13 +290,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
