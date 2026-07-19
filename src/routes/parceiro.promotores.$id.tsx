@@ -89,7 +89,7 @@ function PromoterDetail() {
         <header className="surface-card flex flex-wrap items-start justify-between gap-4 p-6">
           <div className="flex items-start gap-4">
             <div className="grid h-14 w-14 place-items-center rounded-2xl bg-secondary/15 text-lg font-semibold text-secondary">
-              {promoter.name.split(" ").map((s) => s[0]).slice(0, 2).join("")}
+              {promoter.name.split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
