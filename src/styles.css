@@ -171,6 +171,15 @@ html {
   border: 1px solid oklch(1 0 0 / 0.04);
   border-radius: 1rem;
 }
+.light .surface-card {
+  border-color: oklch(0.88 0.01 250 / 0.8);
+  box-shadow: 0 1px 2px oklch(0.2 0.03 260 / 0.04), 0 8px 24px -12px oklch(0.2 0.03 260 / 0.08);
+}
+.light [class*="hero-card"] {
+  background: linear-gradient(160deg, oklch(1 0 0) 0%, oklch(0.985 0.005 250) 100%);
+  box-shadow: 0 2px 4px oklch(0.2 0.03 260 / 0.04), 0 24px 48px -20px oklch(0.2 0.03 260 / 0.12);
+}
+
 
 @keyframes pulse-ring {
   0%, 100% { box-shadow: 0 0 0 0 oklch(0.82 0.19 160 / 0.35); }
