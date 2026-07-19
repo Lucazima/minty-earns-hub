@@ -1,3 +1,5 @@
+export type RecentDeposit = { date: string; player: string; amount: number };
+
 export type Promoter = {
   id: string;
   name: string;
@@ -11,6 +13,30 @@ export type Promoter = {
   commissionDue: number;
   joinedAt: string;
   lastActivity: string;
+};
+
+// Deterministic mock history for sparkline (last 6 months, older → newer).
+export const depositsHistory = (p: Promoter): number[] => {
+  const base = p.depositsMTD;
+  const seed = p.id.charCodeAt(2) || 3;
+  const factors = [0.62, 0.71, 0.83, 0.79, 0.92, 1];
+  return factors.map((f, i) => Math.round(base * f * (0.9 + ((seed + i) % 5) * 0.04)));
+};
+
+const firstNames = ["Lucas", "Ana", "Bruno", "Júlia", "Rafael", "Sofia", "Enzo", "Helena"];
+export const recentDepositsFor = (p: Promoter): RecentDeposit[] => {
+  const seed = p.id.charCodeAt(3) || 5;
+  const today = new Date("2026-11-18");
+  return Array.from({ length: 5 }).map((_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i * 2 - (seed % 3));
+    const amount = Math.round(((p.depositsMTD / Math.max(p.activePlayers, 4)) * (0.6 + ((seed + i) % 7) * 0.12)) / 10) * 10;
+    return {
+      date: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }),
+      player: `${firstNames[(seed + i) % firstNames.length]} ${String.fromCharCode(65 + ((seed + i * 3) % 26))}.`,
+      amount,
+    };
+  });
 };
 
 export const promoters: Promoter[] = [
