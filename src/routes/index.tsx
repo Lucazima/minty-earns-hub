@@ -27,7 +27,10 @@ const recent = [
 ];
 
 function Dashboard() {
+  const { isNewPromoter } = useApp();
+  if (isNewPromoter) return <EmptyDashboard />;
   return (
+
     <AppShell>
       <div className="space-y-8">
         {/* Greeting */}
