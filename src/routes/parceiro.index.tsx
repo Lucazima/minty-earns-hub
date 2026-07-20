@@ -140,6 +140,7 @@ function PartnerDashboard() {
         </ul>
       </section>
     </div>
+    </PartnerShell>
   );
 }
 
