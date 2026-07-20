@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, ArrowUpDown, CheckCircle2, PauseCircle, Aler
 import { PartnerShell } from "@/components/PartnerShell";
 import { promoters, brl, tierClass, statusClass, statusLabel, type Promoter } from "@/lib/partnerData";
 
-export const Route = createFileRoute("/parceiro/promotores")({
+export const Route = createFileRoute("/parceiro/promotores/")({
   head: () => ({
     meta: [
       { title: "Promotores — Portal PalazeHub" },
