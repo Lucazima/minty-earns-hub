@@ -17,6 +17,7 @@ import { Route as LinkRouteImport } from './routes/link'
 import { Route as ExtratoRouteImport } from './routes/extrato'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ParceiroIndexRouteImport } from './routes/parceiro.index'
+import { Route as ParceiroPromotoresRouteImport } from './routes/parceiro.promotores'
 import { Route as ParceiroPagamentosRouteImport } from './routes/parceiro.pagamentos'
 import { Route as ParceiroDepositosRouteImport } from './routes/parceiro.depositos'
 import { Route as ParceiroPromotoresIndexRouteImport } from './routes/parceiro.promotores.index'
@@ -62,6 +63,11 @@ const ParceiroIndexRoute = ParceiroIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ParceiroRoute,
 } as any)
+const ParceiroPromotoresRoute = ParceiroPromotoresRouteImport.update({
+  id: '/promotores',
+  path: '/promotores',
+  getParentRoute: () => ParceiroRoute,
+} as any)
 const ParceiroPagamentosRoute = ParceiroPagamentosRouteImport.update({
   id: '/pagamentos',
   path: '/pagamentos',
@@ -73,14 +79,14 @@ const ParceiroDepositosRoute = ParceiroDepositosRouteImport.update({
   getParentRoute: () => ParceiroRoute,
 } as any)
 const ParceiroPromotoresIndexRoute = ParceiroPromotoresIndexRouteImport.update({
-  id: '/promotores/',
-  path: '/promotores/',
-  getParentRoute: () => ParceiroRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ParceiroPromotoresRoute,
 } as any)
 const ParceiroPromotoresIdRoute = ParceiroPromotoresIdRouteImport.update({
-  id: '/promotores/$id',
-  path: '/promotores/$id',
-  getParentRoute: () => ParceiroRoute,
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ParceiroPromotoresRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRouteWithChildren
   '/parceiro/': typeof ParceiroIndexRoute
   '/parceiro/promotores/$id': typeof ParceiroPromotoresIdRoute
   '/parceiro/promotores/': typeof ParceiroPromotoresIndexRoute
@@ -121,6 +128,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
+  '/parceiro/promotores': typeof ParceiroPromotoresRouteWithChildren
   '/parceiro/': typeof ParceiroIndexRoute
   '/parceiro/promotores/$id': typeof ParceiroPromotoresIdRoute
   '/parceiro/promotores/': typeof ParceiroPromotoresIndexRoute
@@ -137,6 +145,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
+    | '/parceiro/promotores'
     | '/parceiro/'
     | '/parceiro/promotores/$id'
     | '/parceiro/promotores/'
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
+    | '/parceiro/promotores'
     | '/parceiro/'
     | '/parceiro/promotores/$id'
     | '/parceiro/promotores/'
@@ -237,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParceiroIndexRouteImport
       parentRoute: typeof ParceiroRoute
     }
+    '/parceiro/promotores': {
+      id: '/parceiro/promotores'
+      path: '/promotores'
+      fullPath: '/parceiro/promotores'
+      preLoaderRoute: typeof ParceiroPromotoresRouteImport
+      parentRoute: typeof ParceiroRoute
+    }
     '/parceiro/pagamentos': {
       id: '/parceiro/pagamentos'
       path: '/pagamentos'
@@ -253,35 +270,46 @@ declare module '@tanstack/react-router' {
     }
     '/parceiro/promotores/': {
       id: '/parceiro/promotores/'
-      path: '/promotores'
+      path: '/'
       fullPath: '/parceiro/promotores/'
       preLoaderRoute: typeof ParceiroPromotoresIndexRouteImport
-      parentRoute: typeof ParceiroRoute
+      parentRoute: typeof ParceiroPromotoresRoute
     }
     '/parceiro/promotores/$id': {
       id: '/parceiro/promotores/$id'
-      path: '/promotores/$id'
+      path: '/$id'
       fullPath: '/parceiro/promotores/$id'
       preLoaderRoute: typeof ParceiroPromotoresIdRouteImport
-      parentRoute: typeof ParceiroRoute
+      parentRoute: typeof ParceiroPromotoresRoute
     }
   }
 }
 
+interface ParceiroPromotoresRouteChildren {
+  ParceiroPromotoresIdRoute: typeof ParceiroPromotoresIdRoute
+  ParceiroPromotoresIndexRoute: typeof ParceiroPromotoresIndexRoute
+}
+
+const ParceiroPromotoresRouteChildren: ParceiroPromotoresRouteChildren = {
+  ParceiroPromotoresIdRoute: ParceiroPromotoresIdRoute,
+  ParceiroPromotoresIndexRoute: ParceiroPromotoresIndexRoute,
+}
+
+const ParceiroPromotoresRouteWithChildren =
+  ParceiroPromotoresRoute._addFileChildren(ParceiroPromotoresRouteChildren)
+
 interface ParceiroRouteChildren {
   ParceiroDepositosRoute: typeof ParceiroDepositosRoute
   ParceiroPagamentosRoute: typeof ParceiroPagamentosRoute
+  ParceiroPromotoresRoute: typeof ParceiroPromotoresRouteWithChildren
   ParceiroIndexRoute: typeof ParceiroIndexRoute
-  ParceiroPromotoresIdRoute: typeof ParceiroPromotoresIdRoute
-  ParceiroPromotoresIndexRoute: typeof ParceiroPromotoresIndexRoute
 }
 
 const ParceiroRouteChildren: ParceiroRouteChildren = {
   ParceiroDepositosRoute: ParceiroDepositosRoute,
   ParceiroPagamentosRoute: ParceiroPagamentosRoute,
+  ParceiroPromotoresRoute: ParceiroPromotoresRouteWithChildren,
   ParceiroIndexRoute: ParceiroIndexRoute,
-  ParceiroPromotoresIdRoute: ParceiroPromotoresIdRoute,
-  ParceiroPromotoresIndexRoute: ParceiroPromotoresIndexRoute,
 }
 
 const ParceiroRouteWithChildren = ParceiroRoute._addFileChildren(
