@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Users, TrendingUp, Wallet, ShieldCheck, Activity } from "lucide-react";
+import { PartnerShell } from "@/components/PartnerShell";
 import { CountUp } from "@/components/CountUp";
 import { promoters, brl } from "@/lib/partnerData";
 
