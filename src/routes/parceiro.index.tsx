@@ -24,6 +24,7 @@ function PartnerDashboard() {
   const maxDep = top[0].depositsMTD;
 
   return (
+    <PartnerShell>
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
