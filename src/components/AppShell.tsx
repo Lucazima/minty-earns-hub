@@ -74,8 +74,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="hidden h-9 w-9 place-items-center rounded-full bg-secondary/20 text-sm font-semibold text-secondary md:grid">
               M
             </div>
-
+          </div>
         </div>
+
       </header>
 
 
