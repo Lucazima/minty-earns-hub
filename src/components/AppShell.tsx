@@ -15,7 +15,14 @@ const nav = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const { theme, toggleTheme, isNewPromoter, setIsNewPromoter } = useApp();
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  }
+
 
   return (
     <div className="min-h-screen bg-background">
