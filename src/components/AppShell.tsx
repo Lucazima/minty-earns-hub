@@ -63,10 +63,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" strokeWidth={2} /> : <Moon className="h-4 w-4" strokeWidth={2} />}
             </button>
+            <button
+              onClick={signOut}
+              aria-label="Sair"
+              title="Sair"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface/50 text-muted-foreground transition hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" strokeWidth={2} />
+            </button>
             <div className="hidden h-9 w-9 place-items-center rounded-full bg-secondary/20 text-sm font-semibold text-secondary md:grid">
               M
             </div>
-          </div>
+
         </div>
       </header>
 
