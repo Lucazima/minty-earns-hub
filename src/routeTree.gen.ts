@@ -16,9 +16,12 @@ import { Route as LinkRouteImport } from './routes/link'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as ParceiroIndexRouteImport } from './routes/parceiro.index'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as ParceiroPromotoresRouteImport } from './routes/parceiro.promotores'
 import { Route as ParceiroPagamentosRouteImport } from './routes/parceiro.pagamentos'
 import { Route as ParceiroDepositosRouteImport } from './routes/parceiro.depositos'
+import { Route as AuthenticatedReceberRouteImport } from './routes/_authenticated/receber'
+import { Route as AuthenticatedExtratoRouteImport } from './routes/_authenticated/extrato'
 import { Route as ParceiroPromotoresIndexRouteImport } from './routes/parceiro.promotores.index'
 import { Route as ParceiroPromotoresIdRouteImport } from './routes/parceiro.promotores.$id'
 
@@ -56,6 +59,11 @@ const ParceiroIndexRoute = ParceiroIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ParceiroRoute,
 } as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ParceiroPromotoresRoute = ParceiroPromotoresRouteImport.update({
   id: '/promotores',
   path: '/promotores',
@@ -71,6 +79,16 @@ const ParceiroDepositosRoute = ParceiroDepositosRouteImport.update({
   path: '/depositos',
   getParentRoute: () => ParceiroRoute,
 } as any)
+const AuthenticatedReceberRoute = AuthenticatedReceberRouteImport.update({
+  id: '/receber',
+  path: '/receber',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedExtratoRoute = AuthenticatedExtratoRouteImport.update({
+  id: '/extrato',
+  path: '/extrato',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ParceiroPromotoresIndexRoute = ParceiroPromotoresIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -83,12 +101,14 @@ const ParceiroPromotoresIdRoute = ParceiroPromotoresIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedRouteRoute
+  '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/parceiro': typeof ParceiroRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/extrato': typeof AuthenticatedExtratoRoute
+  '/receber': typeof AuthenticatedReceberRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
   '/parceiro/promotores': typeof ParceiroPromotoresRouteWithChildren
@@ -97,28 +117,33 @@ export interface FileRoutesByFullPath {
   '/parceiro/promotores/': typeof ParceiroPromotoresIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthenticatedRouteRoute
   '/auth': typeof AuthRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/extrato': typeof AuthenticatedExtratoRoute
+  '/receber': typeof AuthenticatedReceberRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
+  '/': typeof AuthenticatedIndexRoute
   '/parceiro': typeof ParceiroIndexRoute
   '/parceiro/promotores/$id': typeof ParceiroPromotoresIdRoute
   '/parceiro/promotores': typeof ParceiroPromotoresIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/parceiro': typeof ParceiroRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/extrato': typeof AuthenticatedExtratoRoute
+  '/_authenticated/receber': typeof AuthenticatedReceberRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
   '/parceiro/promotores': typeof ParceiroPromotoresRouteWithChildren
+  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/parceiro/': typeof ParceiroIndexRoute
   '/parceiro/promotores/$id': typeof ParceiroPromotoresIdRoute
   '/parceiro/promotores/': typeof ParceiroPromotoresIndexRoute
@@ -132,6 +157,8 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/parceiro'
     | '/sitemap.xml'
+    | '/extrato'
+    | '/receber'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
     | '/parceiro/promotores'
@@ -140,13 +167,15 @@ export interface FileRouteTypes {
     | '/parceiro/promotores/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/auth'
     | '/link'
     | '/onboarding'
     | '/sitemap.xml'
+    | '/extrato'
+    | '/receber'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
+    | '/'
     | '/parceiro'
     | '/parceiro/promotores/$id'
     | '/parceiro/promotores'
@@ -158,16 +187,19 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/parceiro'
     | '/sitemap.xml'
+    | '/_authenticated/extrato'
+    | '/_authenticated/receber'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
     | '/parceiro/promotores'
+    | '/_authenticated/'
     | '/parceiro/'
     | '/parceiro/promotores/$id'
     | '/parceiro/promotores/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   LinkRoute: typeof LinkRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -226,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParceiroIndexRouteImport
       parentRoute: typeof ParceiroRoute
     }
+    '/_authenticated/': {
+      id: '/_authenticated/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/parceiro/promotores': {
       id: '/parceiro/promotores'
       path: '/promotores'
@@ -247,6 +286,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParceiroDepositosRouteImport
       parentRoute: typeof ParceiroRoute
     }
+    '/_authenticated/receber': {
+      id: '/_authenticated/receber'
+      path: '/receber'
+      fullPath: '/receber'
+      preLoaderRoute: typeof AuthenticatedReceberRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/extrato': {
+      id: '/_authenticated/extrato'
+      path: '/extrato'
+      fullPath: '/extrato'
+      preLoaderRoute: typeof AuthenticatedExtratoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/parceiro/promotores/': {
       id: '/parceiro/promotores/'
       path: '/'
@@ -263,6 +316,21 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedExtratoRoute: typeof AuthenticatedExtratoRoute
+  AuthenticatedReceberRoute: typeof AuthenticatedReceberRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedExtratoRoute: AuthenticatedExtratoRoute,
+  AuthenticatedReceberRoute: AuthenticatedReceberRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface ParceiroPromotoresRouteChildren {
   ParceiroPromotoresIdRoute: typeof ParceiroPromotoresIdRoute
@@ -296,7 +364,7 @@ const ParceiroRouteWithChildren = ParceiroRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRouteRoute: AuthenticatedRouteRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   LinkRoute: LinkRoute,
   OnboardingRoute: OnboardingRoute,
