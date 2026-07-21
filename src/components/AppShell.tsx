@@ -1,7 +1,9 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck, Building2 } from "lucide-react";
+import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck, Building2, LogOut } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import { supabase } from "@/integrations/supabase/client";
+
 
 
 const nav = [
@@ -13,7 +15,14 @@ const nav = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const { theme, toggleTheme, isNewPromoter, setIsNewPromoter } = useApp();
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,11 +63,20 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" strokeWidth={2} /> : <Moon className="h-4 w-4" strokeWidth={2} />}
             </button>
+            <button
+              onClick={signOut}
+              aria-label="Sair"
+              title="Sair"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface/50 text-muted-foreground transition hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" strokeWidth={2} />
+            </button>
             <div className="hidden h-9 w-9 place-items-center rounded-full bg-secondary/20 text-sm font-semibold text-secondary md:grid">
               M
             </div>
           </div>
         </div>
+
       </header>
 
 

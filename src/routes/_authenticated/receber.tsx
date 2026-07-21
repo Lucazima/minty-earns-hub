@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Check, ShieldCheck, Zap } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { CountUp } from "@/components/CountUp";
+import { loadDashboard, requestWithdrawal } from "@/lib/promoterData";
 
-export const Route = createFileRoute("/receber")({
+export const Route = createFileRoute("/_authenticated/receber")({
   head: () => ({
     meta: [
       { title: "Receber — PalazeHub" },
@@ -14,30 +17,55 @@ export const Route = createFileRoute("/receber")({
   component: Receber,
 });
 
-const available = 1240.9;
-
 function Receber() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({ queryKey: ["dashboard"], queryFn: loadDashboard });
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [pixKey, setPixKey] = useState("marina@email.com");
+  const [pixKey, setPixKey] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Initialize pix key from profile once loaded
+  if (data && pixKey === "" && data.profile.pix_key) {
+    setPixKey(data.profile.pix_key);
+  }
+
+  const available = data?.available ?? 0;
+
+  async function confirm() {
+    if (available <= 0) {
+      toast.error("Sem saldo disponível pra sacar agora.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await requestWithdrawal(available, pixKey);
+      await qc.invalidateQueries({ queryKey: ["dashboard"] });
+      await qc.invalidateQueries({ queryKey: ["withdrawals"] });
+      setStep(3);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não deu pra enviar. Tenta de novo.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <AppShell>
       <div className="mx-auto max-w-xl space-y-8">
         <div>
-          <p className="eyebrow">Passo {step} de 2</p>
+          <p className="eyebrow">Passo {step === 3 ? 2 : step} de 2</p>
           <h1 className="font-display mt-1 text-3xl font-bold tracking-tight md:text-4xl">
             {step === 3 ? "Prontinho." : "Receber agora."}
           </h1>
         </div>
 
-        {/* Available amount card */}
         <section className="hero-card relative p-6 md:p-8">
           <div className="hero-glow" />
           <div className="relative">
             <span className="eyebrow">Disponível pra você</span>
             <div className="mt-3">
               <span className="font-display text-5xl font-bold text-primary md:text-6xl">
-                R$&nbsp;<CountUp value={available} />
+                R$&nbsp;{isLoading ? "—" : <CountUp value={available} />}
               </span>
             </div>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -60,17 +88,19 @@ function Receber() {
                 id="pix"
                 value={pixKey}
                 onChange={(e) => setPixKey(e.target.value)}
+                placeholder="CPF, e-mail, telefone ou chave aleatória"
                 className="mt-2 w-full rounded-xl border border-border bg-background/60 px-4 py-3.5 font-display text-lg font-semibold text-foreground outline-none focus:border-primary/60"
               />
               <p className="mt-2 text-xs text-muted-foreground">
-                Pode ser CPF, e-mail, telefone ou chave aleatória.
+                A gente guarda pra próxima vez ser mais rápido.
               </p>
             </div>
             <button
-              onClick={() => setStep(2)}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.99]"
+              onClick={() => pixKey.trim() ? setStep(2) : toast.error("Preencha sua chave Pix.")}
+              disabled={available <= 0 || isLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
             >
-              Continuar <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+              {available <= 0 ? "Sem saldo disponível" : (<>Continuar <ArrowRight className="h-4 w-4" strokeWidth={2.5} /></>)}
             </button>
           </section>
         )}
@@ -87,15 +117,17 @@ function Receber() {
             <div className="flex flex-col gap-2 pt-2 sm:flex-row">
               <button
                 onClick={() => setStep(1)}
+                disabled={submitting}
                 className="rounded-xl border border-border bg-transparent px-5 py-3.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
               >
                 Voltar
               </button>
               <button
-                onClick={() => setStep(3)}
-                className="flex-1 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.99]"
+                onClick={confirm}
+                disabled={submitting}
+                className="flex-1 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-60"
               >
-                Confirmar e receber
+                {submitting ? "Enviando…" : "Confirmar e receber"}
               </button>
             </div>
           </section>
@@ -108,7 +140,7 @@ function Receber() {
             </div>
             <h2 className="font-display mt-5 text-2xl font-semibold">Enviado.</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              R$ {available.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} caindo na sua chave {pixKey}. Costuma chegar em poucos segundos.
+              Seu saque de R$ {available.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} está a caminho da chave {pixKey}.
             </p>
             <Link
               to="/"

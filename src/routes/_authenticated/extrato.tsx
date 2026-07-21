@@ -1,8 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowDownRight, ArrowUpRight, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import {
+  loadCommissions,
+  loadWithdrawals,
+  groupByDay,
+  formatTime,
+  type Commission,
+} from "@/lib/promoterData";
 
-export const Route = createFileRoute("/extrato")({
+export const Route = createFileRoute("/_authenticated/extrato")({
   head: () => ({
     meta: [
       { title: "Extrato — PalazeHub" },
@@ -13,45 +21,38 @@ export const Route = createFileRoute("/extrato")({
 });
 
 type Entry = {
-  kind: "commission" | "withdrawal" | "signup";
+  kind: "commission" | "signup" | "withdrawal";
   title: string;
   detail: string;
-  amount: number; // positive = in, negative = out
+  amount: number;
   when: string;
-  day: string;
+  key: string;
 };
 
-const groups: { day: string; total: number; items: Entry[] }[] = [
-  {
-    day: "Hoje",
-    total: 158.4,
-    items: [
-      { kind: "commission", title: "Comissão de Lucas T.", detail: "depositou R$ 300", amount: 45, when: "14:22", day: "Hoje" },
-      { kind: "signup", title: "Nova indicação: Carla M.", detail: "se cadastrou pelo seu link", amount: 15, when: "12:08", day: "Hoje" },
-      { kind: "commission", title: "Comissão de Rafa P.", detail: "depositou R$ 650", amount: 98.4, when: "09:14", day: "Hoje" },
-    ],
-  },
-  {
-    day: "Ontem",
-    total: 320,
-    items: [
-      { kind: "withdrawal", title: "Você recebeu no Pix", detail: "para chave marina@…", amount: -320, when: "18:44", day: "Ontem" },
-      { kind: "commission", title: "Comissão de Bruno S.", detail: "depositou R$ 800", amount: 120, when: "11:02", day: "Ontem" },
-    ],
-  },
-  {
-    day: "Esta semana",
-    total: 480.6,
-    items: [
-      { kind: "commission", title: "Comissão de Ana L.", detail: "depositou R$ 500", amount: 75, when: "seg, 20:14", day: "Esta semana" },
-      { kind: "commission", title: "Comissão diária apurada", detail: "6 pessoas ativas", amount: 210.6, when: "seg, 09:00", day: "Esta semana" },
-      { kind: "signup", title: "Nova indicação: Pedro V.", detail: "se cadastrou pelo seu link", amount: 15, when: "dom, 22:03", day: "Esta semana" },
-      { kind: "commission", title: "Comissão de Julia F.", detail: "depositou R$ 400", amount: 60, when: "dom, 16:41", day: "Esta semana" },
-    ],
-  },
-];
-
 function Extrato() {
+  const commissionsQ = useQuery({ queryKey: ["commissions"], queryFn: loadCommissions });
+  const withdrawalsQ = useQuery({ queryKey: ["withdrawals"], queryFn: loadWithdrawals });
+
+  const loading = commissionsQ.isLoading || withdrawalsQ.isLoading;
+  const commissions = commissionsQ.data ?? [];
+  const withdrawals = withdrawalsQ.data ?? [];
+
+  // Build unified entries and group by day (commissions positive, withdrawals negative)
+  const allDated: (Commission & { _kind: "in" } | { id: string; kind: "withdrawal"; title: string; detail: string; amount: number; occurred_at: string; _kind: "out" })[] = [
+    ...commissions.map((c) => ({ ...c, _kind: "in" as const })),
+    ...withdrawals.map((w) => ({
+      id: w.id,
+      kind: "withdrawal" as const,
+      title: w.status === "paid" ? "Você recebeu no Pix" : "Saque solicitado",
+      detail: `para chave ${w.pix_key}`,
+      amount: -Number(w.amount),
+      occurred_at: w.created_at,
+      _kind: "out" as const,
+    })),
+  ].sort((a, b) => (a.occurred_at < b.occurred_at ? 1 : -1));
+
+  const groups = groupByDay(allDated as unknown as Commission[]);
+
   return (
     <AppShell>
       <div className="space-y-8">
@@ -65,19 +66,45 @@ function Extrato() {
           </p>
         </div>
 
-        {groups.map((g) => (
+        {loading && (
+          <div className="space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="surface-card h-24 animate-pulse" />
+            ))}
+          </div>
+        )}
+
+        {!loading && groups.length === 0 && (
+          <div className="surface-card p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Ainda não tem movimentação. Compartilhe seu link e os primeiros ganhos aparecem aqui.
+            </p>
+          </div>
+        )}
+
+        {!loading && groups.map((g) => (
           <section key={g.day}>
             <div className="mb-3 flex items-baseline justify-between px-1">
               <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 {g.day}
               </h2>
               <span className="font-display text-sm font-semibold tabular text-foreground">
-                {g.total >= 0 ? "+" : ""}R$ {g.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                {g.total >= 0 ? "+" : ""}R$ {Math.abs(g.total).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
               </span>
             </div>
             <div className="surface-card divide-y divide-border/40 overflow-hidden">
-              {g.items.map((it, i) => (
-                <EntryRow key={i} entry={it} />
+              {g.items.map((it) => (
+                <EntryRow
+                  key={it.id}
+                  entry={{
+                    kind: it.kind as Entry["kind"],
+                    title: it.title,
+                    detail: it.detail,
+                    amount: Number(it.amount),
+                    when: formatTime(it.occurred_at),
+                    key: it.id,
+                  }}
+                />
               ))}
             </div>
           </section>

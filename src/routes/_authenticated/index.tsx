@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, TrendingUp, Users, Wallet, Sparkles, Share2, Rocket } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CountUp } from "@/components/CountUp";
-import { useApp } from "@/context/AppContext";
+import { loadDashboard, formatTime } from "@/lib/promoterData";
 
-export const Route = createFileRoute("/")({
-
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Painel — PalazeHub" },
@@ -15,54 +15,75 @@ export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
-const commissionMonth = 2847.5;
-const referred = 34;
-const deposited = 18420;
-const available = 1240.9;
-
-const recent = [
-  { name: "João compartilhou seu link", value: 45.0, time: "há 12 min" },
-  { name: "Nova indicação depositou R$ 200", value: 30.0, time: "há 1 h" },
-  { name: "Comissão diária apurada", value: 128.4, time: "hoje, 09:00" },
-];
-
 function Dashboard() {
-  const { isNewPromoter } = useApp();
-  if (isNewPromoter) return <EmptyDashboard />;
-  return (
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: loadDashboard,
+  });
 
+  if (isLoading) {
+    return (
+      <AppShell>
+        <div className="space-y-6">
+          <div className="h-8 w-40 animate-pulse rounded bg-surface" />
+          <div className="hero-card h-56 animate-pulse" />
+          <div className="grid gap-4 md:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="surface-card h-28 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <AppShell>
+        <div className="surface-card p-8 text-center">
+          <p className="text-sm text-muted-foreground">Não deu pra carregar seus dados agora. Tenta atualizar a página.</p>
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (data.monthEarnings === 0 && data.referredCount === 0) {
+    return <EmptyDashboard name={data.profile.display_name} />;
+  }
+
+  return (
     <AppShell>
       <div className="space-y-8">
-        {/* Greeting */}
         <div>
-          <p className="eyebrow">Olá, Marina</p>
+          <p className="eyebrow">Olá, {data.profile.display_name}</p>
           <h1 className="font-display mt-1 text-3xl font-bold tracking-tight md:text-4xl">
             Bom te ver por aqui.
           </h1>
         </div>
 
-        {/* Hero earnings card — signature element */}
         <section className="hero-card relative p-6 md:p-10">
           <div className="hero-glow" />
           <div className="relative">
             <div className="flex items-center justify-between">
               <span className="eyebrow">Seus ganhos neste mês</span>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">
-                  <TrendingUp className="h-3 w-3" strokeWidth={2.5} /> +18%
-                </span>
-                <span className="hidden text-xs text-muted-foreground sm:inline">vs. mês passado</span>
-              </div>
+              {data.monthChangePct !== null && (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">
+                    <TrendingUp className="h-3 w-3" strokeWidth={2.5} />
+                    {data.monthChangePct >= 0 ? "+" : ""}{data.monthChangePct.toFixed(0)}%
+                  </span>
+                  <span className="hidden text-xs text-muted-foreground sm:inline">vs. mês passado</span>
+                </div>
+              )}
             </div>
-
 
             <div className="mt-5 flex items-baseline gap-2">
               <span className="font-display text-5xl font-bold text-primary md:text-7xl">
-                R$&nbsp;<CountUp value={commissionMonth} />
+                R$&nbsp;<CountUp value={data.monthEarnings} />
               </span>
             </div>
             <p className="mt-3 max-w-md text-sm text-muted-foreground">
-              É o quanto você já ganhou compartilhando seu link em novembro. Continue nesse ritmo.
+              É o quanto você já ganhou compartilhando seu link neste mês. Continue nesse ritmo.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -70,7 +91,7 @@ function Dashboard() {
                 to="/receber"
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.98]"
               >
-                Receber R$ {available.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                Receber R$ {data.available.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 <ArrowUpRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
               <Link
@@ -83,27 +104,26 @@ function Dashboard() {
           </div>
         </section>
 
-        {/* Metrics */}
         <section className="grid gap-4 md:grid-cols-3">
           <MetricCard
             eyebrow="Pessoas que você indicou"
-            value={referred}
+            value={data.referredCount}
             icon={<Users className="h-4 w-4" strokeWidth={2} />}
-            hint="+4 esta semana"
+            hint={data.referredCount > 0 ? "Continue compartilhando" : "Convide a primeira"}
             prefix=""
             decimals={0}
           />
           <MetricCard
             eyebrow="Elas depositaram"
-            value={deposited}
+            value={data.totalDeposited}
             icon={<TrendingUp className="h-4 w-4" strokeWidth={2} />}
-            hint="Média R$ 542 por pessoa"
+            hint={data.referredCount > 0 ? `Média R$ ${(data.totalDeposited / data.referredCount).toLocaleString("pt-BR", { maximumFractionDigits: 0 })} por pessoa` : "Aguardando primeiros depósitos"}
             prefix="R$ "
             decimals={0}
           />
           <MetricCard
             eyebrow="Disponível para saque"
-            value={available}
+            value={data.available}
             icon={<Wallet className="h-4 w-4" strokeWidth={2} />}
             hint="Cai na hora no seu Pix"
             prefix="R$ "
@@ -112,7 +132,6 @@ function Dashboard() {
           />
         </section>
 
-        {/* Activity + tip */}
         <section className="grid gap-6 md:grid-cols-3">
           <div className="surface-card p-5 md:col-span-2">
             <div className="flex items-center justify-between">
@@ -122,14 +141,19 @@ function Dashboard() {
               </Link>
             </div>
             <ul className="mt-4 divide-y divide-border/40">
-              {recent.map((r, i) => (
-                <li key={i} className="flex items-center justify-between py-3.5">
+              {data.recent.length === 0 && (
+                <li className="py-6 text-center text-sm text-muted-foreground">
+                  Nada ainda. Vai aparecer aqui assim que rolar.
+                </li>
+              )}
+              {data.recent.map((r) => (
+                <li key={r.id} className="flex items-center justify-between py-3.5">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground">{r.name}</p>
-                    <p className="text-xs text-muted-foreground">{r.time}</p>
+                    <p className="truncate text-sm font-medium text-foreground">{r.title}</p>
+                    <p className="text-xs text-muted-foreground">{formatTime(r.occurred_at)}</p>
                   </div>
                   <span className="font-display shrink-0 text-sm font-semibold tabular text-primary">
-                    +R$ {r.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    +R$ {Number(r.amount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </span>
                 </li>
               ))}
@@ -180,7 +204,7 @@ function MetricCard({
   );
 }
 
-function EmptyDashboard() {
+function EmptyDashboard({ name }: { name: string }) {
   const steps = [
     { n: 1, title: "Copie seu link", body: "Ele é só seu — quem entra por ele fica atrelado à sua conta." },
     { n: 2, title: "Compartilhe onde tiver gente", body: "WhatsApp, Instagram, grupos. Um envio já vale." },
@@ -190,7 +214,7 @@ function EmptyDashboard() {
     <AppShell>
       <div className="space-y-8">
         <div>
-          <p className="eyebrow">Bem-vinda, Marina</p>
+          <p className="eyebrow">Bem-vindo, {name}</p>
           <h1 className="font-display mt-1 text-3xl font-bold tracking-tight md:text-4xl">
             Vamos fazer os primeiros ganhos.
           </h1>
@@ -241,22 +265,7 @@ function EmptyDashboard() {
             </div>
           ))}
         </section>
-
-        <section className="grid gap-4 md:grid-cols-3">
-          {[
-            { label: "Pessoas indicadas", hint: "Convide a primeira." },
-            { label: "Depósitos gerados", hint: "Nenhum ainda." },
-            { label: "Disponível para saque", hint: "Chegando em breve." },
-          ].map((m) => (
-            <div key={m.label} className="surface-card p-5">
-              <span className="eyebrow">{m.label}</span>
-              <div className="font-display mt-4 text-3xl font-bold tabular text-muted-foreground/60">—</div>
-              <p className="mt-1.5 text-xs text-muted-foreground">{m.hint}</p>
-            </div>
-          ))}
-        </section>
       </div>
     </AppShell>
   );
 }
-

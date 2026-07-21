@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      commissions: {
+        Row: {
+          amount: number
+          created_at: string
+          detail: string
+          id: string
+          kind: string
+          occurred_at: string
+          promoter_id: string
+          title: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          detail?: string
+          id?: string
+          kind: string
+          occurred_at?: string
+          promoter_id: string
+          title: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          detail?: string
+          id?: string
+          kind?: string
+          occurred_at?: string
+          promoter_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          pix_key: string | null
+          referral_code: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string
+          pix_key?: string | null
+          referral_code: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          pix_key?: string | null
+          referral_code?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          promoter_id: string
+          referred_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          promoter_id: string
+          referred_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          promoter_id?: string
+          referred_name?: string
+        }
+        Relationships: []
+      }
+      withdrawals: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          paid_at: string | null
+          pix_key: string
+          promoter_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          pix_key: string
+          promoter_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          pix_key?: string
+          promoter_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
