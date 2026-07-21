@@ -13,6 +13,8 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ParceiroRouteImport } from './routes/parceiro'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LinkRouteImport } from './routes/link'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as ParceiroIndexRouteImport } from './routes/parceiro.index'
 import { Route as ParceiroPromotoresRouteImport } from './routes/parceiro.promotores'
 import { Route as ParceiroPagamentosRouteImport } from './routes/parceiro.pagamentos'
@@ -38,6 +40,15 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const LinkRoute = LinkRouteImport.update({
   id: '/link',
   path: '/link',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParceiroIndexRoute = ParceiroIndexRouteImport.update({
@@ -72,6 +83,8 @@ const ParceiroPromotoresIdRoute = ParceiroPromotoresIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedRouteRoute
+  '/auth': typeof AuthRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/parceiro': typeof ParceiroRouteWithChildren
@@ -84,6 +97,8 @@ export interface FileRoutesByFullPath {
   '/parceiro/promotores/': typeof ParceiroPromotoresIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AuthenticatedRouteRoute
+  '/auth': typeof AuthRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -95,6 +110,8 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteRoute
+  '/auth': typeof AuthRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/parceiro': typeof ParceiroRouteWithChildren
@@ -109,6 +126,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
+    | '/auth'
     | '/link'
     | '/onboarding'
     | '/parceiro'
@@ -121,6 +140,8 @@ export interface FileRouteTypes {
     | '/parceiro/promotores/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
+    | '/auth'
     | '/link'
     | '/onboarding'
     | '/sitemap.xml'
@@ -131,6 +152,8 @@ export interface FileRouteTypes {
     | '/parceiro/promotores'
   id:
     | '__root__'
+    | '/_authenticated'
+    | '/auth'
     | '/link'
     | '/onboarding'
     | '/parceiro'
@@ -144,6 +167,8 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRoute
+  AuthRoute: typeof AuthRoute
   LinkRoute: typeof LinkRoute
   OnboardingRoute: typeof OnboardingRoute
   ParceiroRoute: typeof ParceiroRouteWithChildren
@@ -178,6 +203,20 @@ declare module '@tanstack/react-router' {
       path: '/link'
       fullPath: '/link'
       preLoaderRoute: typeof LinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parceiro/': {
@@ -257,6 +296,8 @@ const ParceiroRouteWithChildren = ParceiroRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRoute,
+  AuthRoute: AuthRoute,
   LinkRoute: LinkRoute,
   OnboardingRoute: OnboardingRoute,
   ParceiroRoute: ParceiroRouteWithChildren,
