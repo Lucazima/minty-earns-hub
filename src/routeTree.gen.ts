@@ -10,12 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ReceberRouteImport } from './routes/receber'
 import { Route as ParceiroRouteImport } from './routes/parceiro'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LinkRouteImport } from './routes/link'
-import { Route as ExtratoRouteImport } from './routes/extrato'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as ParceiroIndexRouteImport } from './routes/parceiro.index'
 import { Route as ParceiroPromotoresRouteImport } from './routes/parceiro.promotores'
 import { Route as ParceiroPagamentosRouteImport } from './routes/parceiro.pagamentos'
@@ -26,11 +23,6 @@ import { Route as ParceiroPromotoresIdRouteImport } from './routes/parceiro.prom
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReceberRoute = ReceberRouteImport.update({
-  id: '/receber',
-  path: '/receber',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParceiroRoute = ParceiroRouteImport.update({
@@ -46,16 +38,6 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const LinkRoute = LinkRouteImport.update({
   id: '/link',
   path: '/link',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExtratoRoute = ExtratoRouteImport.update({
-  id: '/extrato',
-  path: '/extrato',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParceiroIndexRoute = ParceiroIndexRouteImport.update({
@@ -90,12 +72,9 @@ const ParceiroPromotoresIdRoute = ParceiroPromotoresIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/extrato': typeof ExtratoRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/parceiro': typeof ParceiroRouteWithChildren
-  '/receber': typeof ReceberRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
@@ -105,11 +84,8 @@ export interface FileRoutesByFullPath {
   '/parceiro/promotores/': typeof ParceiroPromotoresIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/extrato': typeof ExtratoRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
-  '/receber': typeof ReceberRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
@@ -119,12 +95,9 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/extrato': typeof ExtratoRoute
   '/link': typeof LinkRoute
   '/onboarding': typeof OnboardingRoute
   '/parceiro': typeof ParceiroRouteWithChildren
-  '/receber': typeof ReceberRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/parceiro/depositos': typeof ParceiroDepositosRoute
   '/parceiro/pagamentos': typeof ParceiroPagamentosRoute
@@ -136,12 +109,9 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/extrato'
     | '/link'
     | '/onboarding'
     | '/parceiro'
-    | '/receber'
     | '/sitemap.xml'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
@@ -151,11 +121,8 @@ export interface FileRouteTypes {
     | '/parceiro/promotores/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/extrato'
     | '/link'
     | '/onboarding'
-    | '/receber'
     | '/sitemap.xml'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
@@ -164,12 +131,9 @@ export interface FileRouteTypes {
     | '/parceiro/promotores'
   id:
     | '__root__'
-    | '/'
-    | '/extrato'
     | '/link'
     | '/onboarding'
     | '/parceiro'
-    | '/receber'
     | '/sitemap.xml'
     | '/parceiro/depositos'
     | '/parceiro/pagamentos'
@@ -180,12 +144,9 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ExtratoRoute: typeof ExtratoRoute
   LinkRoute: typeof LinkRoute
   OnboardingRoute: typeof OnboardingRoute
   ParceiroRoute: typeof ParceiroRouteWithChildren
-  ReceberRoute: typeof ReceberRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -196,13 +157,6 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/receber': {
-      id: '/receber'
-      path: '/receber'
-      fullPath: '/receber'
-      preLoaderRoute: typeof ReceberRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parceiro': {
@@ -224,20 +178,6 @@ declare module '@tanstack/react-router' {
       path: '/link'
       fullPath: '/link'
       preLoaderRoute: typeof LinkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/extrato': {
-      id: '/extrato'
-      path: '/extrato'
-      fullPath: '/extrato'
-      preLoaderRoute: typeof ExtratoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parceiro/': {
@@ -317,12 +257,9 @@ const ParceiroRouteWithChildren = ParceiroRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ExtratoRoute: ExtratoRoute,
   LinkRoute: LinkRoute,
   OnboardingRoute: OnboardingRoute,
   ParceiroRoute: ParceiroRouteWithChildren,
-  ReceberRoute: ReceberRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
