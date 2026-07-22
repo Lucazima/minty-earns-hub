@@ -14,61 +14,190 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          entity: string
+          entity_id: string
+          id: string
+          meta: Json
+          reason: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          entity: string
+          entity_id: string
+          id?: string
+          meta?: Json
+          reason?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          entity?: string
+          entity_id?: string
+          id?: string
+          meta?: Json
+          reason?: string
+        }
+        Relationships: []
+      }
+      commission_rates: {
+        Row: {
+          percent: number
+          tier: Database["public"]["Enums"]["commission_tier"]
+          updated_at: string
+        }
+        Insert: {
+          percent: number
+          tier: Database["public"]["Enums"]["commission_tier"]
+          updated_at?: string
+        }
+        Update: {
+          percent?: number
+          tier?: Database["public"]["Enums"]["commission_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       commissions: {
         Row: {
           amount: number
           created_at: string
           detail: string
+          edit_reason: string | null
           id: string
           kind: string
           occurred_at: string
           promoter_id: string
+          source_ref: string
+          status: string
           title: string
         }
         Insert: {
           amount: number
           created_at?: string
           detail?: string
+          edit_reason?: string | null
           id?: string
           kind: string
           occurred_at?: string
           promoter_id: string
+          source_ref?: string
+          status?: string
           title: string
         }
         Update: {
           amount?: number
           created_at?: string
           detail?: string
+          edit_reason?: string | null
           id?: string
           kind?: string
           occurred_at?: string
           promoter_id?: string
+          source_ref?: string
+          status?: string
           title?: string
+        }
+        Relationships: []
+      }
+      partners: {
+        Row: {
+          api_key_hash: string
+          commission_rate: number
+          contact_email: string
+          contact_phone: string
+          created_at: string
+          id: string
+          name: string
+          status: string
+          updated_at: string
+          webhook_url: string
+        }
+        Insert: {
+          api_key_hash?: string
+          commission_rate?: number
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+          webhook_url?: string
+        }
+        Update: {
+          api_key_hash?: string
+          commission_rate?: number
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          webhook_url?: string
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
+          admin_notes: string
           created_at: string
           display_name: string
+          email: string | null
           pix_key: string | null
           referral_code: string
+          status: Database["public"]["Enums"]["promoter_status"]
+          tier: Database["public"]["Enums"]["commission_tier"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          admin_notes?: string
           created_at?: string
           display_name?: string
+          email?: string | null
           pix_key?: string | null
           referral_code: string
+          status?: Database["public"]["Enums"]["promoter_status"]
+          tier?: Database["public"]["Enums"]["commission_tier"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          admin_notes?: string
           created_at?: string
           display_name?: string
+          email?: string | null
           pix_key?: string | null
           referral_code?: string
+          status?: Database["public"]["Enums"]["promoter_status"]
+          tier?: Database["public"]["Enums"]["commission_tier"]
           updated_at?: string
           user_id?: string
         }
@@ -95,6 +224,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       withdrawals: {
         Row: {
           amount: number
@@ -102,7 +252,9 @@ export type Database = {
           id: string
           paid_at: string | null
           pix_key: string
+          processed_by: string | null
           promoter_id: string
+          rejection_reason: string | null
           status: string
         }
         Insert: {
@@ -111,7 +263,9 @@ export type Database = {
           id?: string
           paid_at?: string | null
           pix_key: string
+          processed_by?: string | null
           promoter_id: string
+          rejection_reason?: string | null
           status?: string
         }
         Update: {
@@ -120,7 +274,9 @@ export type Database = {
           id?: string
           paid_at?: string | null
           pix_key?: string
+          processed_by?: string | null
           promoter_id?: string
+          rejection_reason?: string | null
           status?: string
         }
         Relationships: []
@@ -130,10 +286,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "promoter"
+      commission_tier: "novato" | "prata" | "ouro" | "diamante"
+      promoter_status: "pending" | "active" | "suspended" | "banned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -260,6 +424,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "promoter"],
+      commission_tier: ["novato", "prata", "ouro", "diamante"],
+      promoter_status: ["pending", "active", "suspended", "banned"],
+    },
   },
 } as const
