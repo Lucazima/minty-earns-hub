@@ -363,7 +363,7 @@ export const updateCommissionRate = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("commission_rates")
       .update({ percent: data.percent, updated_at: new Date().toISOString() })
-      .eq("tier", data.tier);
+      .eq("tier", data.tier as any);
     if (error) throw error;
     await auditLog(context, "rate.update", "commission_rate", data.tier, "", { percent: data.percent });
     return { ok: true };
