@@ -249,7 +249,7 @@ export const updatePromoterStatus = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { error } = await context.supabase
       .from("profiles")
-      .update({ status: data.status })
+      .update({ status: data.status as any })
       .eq("user_id", data.id);
     if (error) throw error;
     await auditLog(context, "promoter.status", "profile", data.id, data.reason ?? "", {
@@ -265,7 +265,7 @@ export const updatePromoterTier = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { error } = await context.supabase
       .from("profiles")
-      .update({ tier: data.tier })
+      .update({ tier: data.tier as any })
       .eq("user_id", data.id);
     if (error) throw error;
     await auditLog(context, "promoter.tier", "profile", data.id, "", { tier: data.tier });
