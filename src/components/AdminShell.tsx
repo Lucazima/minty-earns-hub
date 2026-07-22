@@ -13,14 +13,15 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const nav = [
+type NavItem = { to: string; label: string; shortLabel: string; icon: any; exact?: boolean };
+const nav: NavItem[] = [
   { to: "/admin", label: "Visão executiva", shortLabel: "Visão", icon: LayoutDashboard, exact: true },
   { to: "/admin/promoters", label: "Promoters", shortLabel: "Promoters", icon: Users },
   { to: "/admin/commissions", label: "Comissões", shortLabel: "Comissões", icon: Coins },
   { to: "/admin/commissions/rates", label: "Taxas por tier", shortLabel: "Taxas", icon: Percent },
   { to: "/admin/payouts", label: "Payouts", shortLabel: "Payouts", icon: Wallet },
   { to: "/admin/partners", label: "Parceiros BET", shortLabel: "Parceiros", icon: Building2 },
-] as const;
+];
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
