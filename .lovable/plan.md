@@ -1,54 +1,72 @@
-## Diagnóstico
+# Admin Panel — PalazeHub
 
-Ao revisar `parceiro.tsx`, `parceiro.promotores.tsx`, `parceiro.depositos.tsx`, `parceiro.pagamentos.tsx` e `PartnerShell.tsx`, encontrei estes pontos que hoje não respondem ao clique ou parecem prometer algo que não existe:
+Painel interno de administração em `/admin`, gated por role `admin`, reutilizando o design system do promoter (dark #0A0E1A + mint #00E28A + roxo #6C5CE7, Space Grotesk display, cards 16px, CountUp nos valores). Tom sério, dados densos com hierarquia — é o "cockpit" da operação.
 
-1. **Não há entrada para o portal da operadora** no shell do promotor (`AppShell`). O único caminho para `/parceiro` é digitar a URL — nem promotor nem parceiro veem um botão para trocar de contexto.
-2. **Linhas da tabela de Promotores** parecem clicáveis (hover, avatar, nome), mas não há detalhe/drawer — não há rota `/parceiro/promotores/$id`.
-3. **Sem ações por promotor**: não dá para pausar, mensagem, revisar KYC ou copiar o link dele. O ícone `AlertTriangle` sugere "precisa revisar" mas não abre nada.
-4. **Toolbar de promotores** sem "Limpar filtros" e sem estado vazio acionável.
-5. **Card "Precisa contestar um valor?"** (em `/parceiro/pagamentos`) descreve fluxo que não existe — nenhum campo de nota, nenhum botão.
-6. **Sidebar do PartnerShell** com link "parceiros@palazehub.com" mas sem link de voltar para o Painel do Promotor; no mobile, a bottom-nav de 4 itens tem labels que quebram em telas estreitas.
-7. **`/parceiro/depositos`**: seletor de período (MTD/30d/90d) só multiplica valores mock — funciona visualmente, mas o botão "Exportar CSV" não dá feedback (sem toast).
-8. **`/parceiro` (visão geral)**: card "Promotores em destaque" tem "Ver todos" ok, mas os itens da lista não são clicáveis.
+## Escopo (MVP funcional, dados reais no Supabase)
 
-## Plano de execução (MVP, cirúrgico)
+### 1. Backend — schema e roles
+Migração única adicionando:
+- Enum `app_role` (`admin`, `promoter`) + tabela `user_roles` + função `has_role()` security definer (padrão anti-recursão).
+- Enum `commission_tier` (`novato`, `prata`, `ouro`, `diamante`).
+- Colunas em `profiles`: `status` (`pending`/`active`/`suspended`/`banned`), `tier`, `admin_notes` (text), `email` (snapshot).
+- Colunas em `commissions`: `status` (`pending`/`approved`/`rejected`/`paid`), `source_ref` (texto/ID do depósito), `edit_reason`.
+- Colunas em `withdrawals`: `rejection_reason`, `processed_by`, mantém `status` (`pending`/`processing`/`paid`/`rejected`).
+- Nova tabela `partners`: nome, contato, taxa acordada, webhook URL, api_key hash, status.
+- Nova tabela `commission_rates`: tier → percentual (linha por tier).
+- Nova tabela `platform_settings`: chave/valor (ex: `min_withdrawal_amount`).
+- Nova tabela `audit_log`: quem/quando/ação/entidade/motivo (para edições de comissão, aprovação/recusa, mudança de tier).
+- RLS: tudo bloqueado exceto `has_role(auth.uid(),'admin')` para as tabelas admin; policies existentes de promoter continuam.
+- Trigger `handle_new_user` atualizado: novo promoter entra como `status='pending'`, tier `novato`.
+- Seed do primeiro admin: instrução para o usuário rodar SQL de promoção após criar sua conta (mostraremos o comando no chat).
 
-### 1. Ponte entre os dois portais
-- Em `AppShell`, adicionar no header (ao lado do toggle de tema) um botão discreto **"Portal da operadora"** que leva a `/parceiro`. Só um link — sem lógica de permissão neste MVP.
-- Em `PartnerShell`, adicionar no header um botão espelhado **"Ver como promotor"** que leva a `/`. Reforça a ideia de "mesma conta, dois lados".
-- Renomear labels do bottom-nav mobile para caberem: "Visão", "Promotores", "Depósitos", "Pagar".
+### 2. Rotas (novo grupo `_admin`)
+Layout `src/routes/_admin/route.tsx` com gate: `has_role(user,'admin')` → senão redirect `/`. Shell próprio `AdminShell` (mesmo design do PartnerShell mas com badge "Admin" roxo).
 
-### 2. Detalhe do promotor (nova rota)
-- Criar `src/routes/parceiro.promotores.$id.tsx` com:
-  - Header com nome, @handle, nível, status, botão **Voltar**.
-  - 3 KPIs: indicações, depósitos MTD, comissão devida (com `CountUp`).
-  - Sparkline simples (SVG puro, sem lib nova) dos últimos 6 meses — dado mock derivado.
-  - Bloco de ações: **Pausar promotor**, **Copiar link do promotor**, **Enviar mensagem** (abre `mailto:`). Todas com toast de confirmação.
-  - Lista dos últimos 5 depósitos atribuídos (mock em `partnerData`).
-- Na tabela de Promotores e no card "Promotores em destaque" da visão geral, envolver as linhas em `<Link>` para a nova rota.
+Telas:
+- `/admin` — **Dashboard executivo**: KPIs (promoters ativos, turnover mês, comissões pendentes, payouts aguardando), gráfico SVG de crescimento (novos promoters + volume 30d), lista de alertas (pending approvals, payouts >7d, atividade suspeita = volume anormal), top 5 performers.
+- `/admin/promoters` — lista com busca, filtros (status, tier, período, faixa de volume), ações inline (aprovar/rejeitar em `pending`).
+- `/admin/promoters/$id` — detalhe: perfil, tier editável, status (suspender/banir/reativar), histórico completo (referrals, depósitos agregados, comissões, payouts), campo `admin_notes` com save.
+- `/admin/commissions` — tabela filtrada (período/promoter/status), ações aprovar/rejeitar, editar valor (modal exige motivo → grava em `audit_log`), coluna "origem" mostra `source_ref`.
+- `/admin/commissions/rates` — configurar % por tier (form simples).
+- `/admin/payouts` — fila pendente com checkbox de seleção múltipla → aprovar em lote / recusar individual (motivo obrigatório). Aba "Histórico" para pagos/recusados. Config de valor mínimo.
+- `/admin/partners` — CRUD de parceiros (BetSul etc), form com nome/contato/taxa/webhook/api_key (gerada), toggle status. Card de performance por parceiro (promoters vinculados, volume, comissão).
 
-### 3. Toolbar e estados vazios
-- Em `/parceiro/promotores`, adicionar botão **"Limpar filtros"** que aparece quando há filtro/busca ativos, e no estado vazio um CTA que limpa tudo.
-- Adicionar um toast global (usar `sonner`, já existente no template shadcn) para feedback de:
-  - "CSV exportado" em `/parceiro/depositos`
-  - "Promotor pausado", "Link copiado", "Mensagem aberta" no detalhe do promotor.
+### 3. Server functions
+`src/lib/admin.functions.ts` (com `requireSupabaseAuth` + checagem de role via `context.supabase.rpc('has_role',...)`):
+- `listPromoters`, `getPromoterDetail`, `updatePromoterStatus`, `updatePromoterTier`, `updatePromoterNotes`
+- `listCommissions`, `updateCommissionStatus`, `editCommissionAmount` (grava audit_log)
+- `getCommissionRates`, `updateCommissionRate`
+- `listPayouts`, `approvePayouts` (bulk), `rejectPayout`, `getMinWithdrawal`, `setMinWithdrawal`
+- `listPartners`, `createPartner`, `updatePartner`, `getPartnerPerformance`
+- `getAdminOverview` (KPIs + série temporal + alertas + top performers)
 
-### 4. Contestação de valor (mini-fluxo)
-- Em `/parceiro/pagamentos`, transformar o card "Precisa contestar um valor?" num pequeno formulário inline: `select` do promotor + `textarea` da nota + botão **Enviar contestação**. Ao enviar, mostra toast "Contestação registrada — respondemos em 48h" e desmarca o promotor automaticamente. Estado local apenas.
+Todas usam `useServerFn` + TanStack Query no cliente, com `invalidateQueries` após mutações e `toast` sonner de feedback.
 
-### 5. Ajustes finos
-- `PartnerShell`: no mobile, sticky bottom-nav com `padding-bottom` seguro (safe-area).
-- Consertar hover falso: remover `cursor-pointer` de linhas que não navegam; nas que navegam agora, manter.
-- Adicionar `<Toaster />` do sonner em `__root.tsx` se ainda não estiver montado.
+### 4. Navegação e link entre portais
+`AppShell` (promoter) e `PartnerShell` ganham link "Admin" visível apenas quando `has_role='admin'` (hook `useIsAdmin`). `AdminShell` tem links recíprocos para "Ver como promotor" / "Portal do parceiro".
 
-## O que não vou mexer
-- Paleta, tipografia, hero cards, `CountUp`, layout geral.
-- Painel do promotor (`/`, `/link`, `/extrato`, `/receber`, `/onboarding`).
-- Lógica de dados reais / backend — segue tudo mock em `src/lib/partnerData.ts`.
-- Nenhuma dependência nova (sonner já vem do template shadcn).
+### 5. O que **não** faz parte deste MVP (fora de escopo, ficam mockados/UI-only)
+- Integração real Pagar.me (payout marca como `paid` manualmente, sem chamada externa).
+- Recepção real de webhook de turnover (endpoint criado stub em `/api/public/webhooks/turnover` com verificação de HMAC, mas sem parceiro real conectado).
+- Detecção automática de "atividade suspeita" (regra simples heurística: promoter com >3x volume médio da semana).
+- Gerar api_key real (armazenamos hash sha256 de string aleatória mostrada uma única vez ao criar).
 
 ## Detalhes técnicos
-- Nova rota segue naming plano do TanStack: `parceiro.promotores.$id.tsx` → `/parceiro/promotores/$id`. `createFileRoute("/parceiro/promotores/$id")`, `Route.useParams()`, `notFoundComponent` para id inválido.
-- Sparkline: função pura que gera `<path d="M..."/>` a partir de array de 6 números — zero libs.
-- Toast: `import { toast } from "sonner"` + `<Toaster richColors position="top-center" />` no root (verificar se já existe antes de duplicar).
-- `partnerData.ts` ganha `depositsHistory: number[]` (6 pontos) e `recentDeposits: {date, player, amount}[]` por promotor, tudo mock determinístico.
+
+**Roles**: padrão Lovable — enum + `user_roles` + `has_role()` SECURITY DEFINER. Nunca guardar role em `profiles`. Primeiro admin promovido via SQL manual (mostrar comando ao usuário após migração).
+
+**Arquitetura de rotas**: `src/routes/_admin/route.tsx` layout com `ssr: false` + `beforeLoad` que valida sessão E role. Filhos: `_admin/index.tsx`, `_admin/promoters.index.tsx`, `_admin/promoters.$id.tsx`, `_admin/commissions.index.tsx`, `_admin/commissions.rates.tsx`, `_admin/payouts.tsx`, `_admin/partners.tsx`.
+
+**Server fns**: pattern `createServerFn().middleware([requireSupabaseAuth]).handler(async ({ context }) => { const isAdmin = await context.supabase.rpc('has_role',{...}); if(!isAdmin) throw new Error('Forbidden'); ... })`. Uso de `context.supabase` (RLS) para reads; `supabaseAdmin` (import dinâmico) apenas para operações que precisam bypass (ex: listar profiles cruzando com auth.users email).
+
+**Design**: reutiliza tokens de `styles.css`, componentes `CountUp`, `AppShell`-style. AdminShell com header roxo sutil (`bg-secondary/10` badge) para diferenciar visualmente sem quebrar identidade.
+
+**Ordem de execução**:
+1. Migração (schema + roles + seed rates + settings).
+2. Server functions.
+3. Layout `_admin` + shell.
+4. Telas na ordem: overview → promoters → commissions → payouts → partners.
+5. Links entre portais + hook `useIsAdmin`.
+6. Testar fluxos com Playwright.
+
+Confirma para prosseguir?
