@@ -6,7 +6,7 @@ import { listCommissions, updateCommissionStatus, editCommissionAmount } from "@
 import { toast } from "sonner";
 import { Check, X, Pencil } from "lucide-react";
 
-export const Route = createFileRoute("/_admin/commissions/")({
+export const Route = createFileRoute("/admin/commissions/")({
   head: () => ({
     meta: [
       { title: "Comissões — PalazeHub Admin" },

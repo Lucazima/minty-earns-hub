@@ -5,7 +5,7 @@ import { getAdminOverview } from "@/lib/admin.functions";
 import { CountUp } from "@/components/CountUp";
 import { AlertTriangle, TrendingUp, Users, Wallet, Coins, ArrowUpRight } from "lucide-react";
 
-export const Route = createFileRoute("/_admin/")({
+export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
       { title: "Visão executiva — PalazeHub Admin" },

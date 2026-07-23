@@ -6,7 +6,7 @@ import { getCommissionRates, updateCommissionRate } from "@/lib/admin.functions"
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 
-export const Route = createFileRoute("/_admin/commissions/rates")({
+export const Route = createFileRoute("/admin/commissions/rates")({
   head: () => ({
     meta: [
       { title: "Taxas por tier — PalazeHub Admin" },

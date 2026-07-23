@@ -6,7 +6,7 @@ import { listPartners, createPartner, updatePartner } from "@/lib/admin.function
 import { toast } from "sonner";
 import { Plus, Copy, Power } from "lucide-react";
 
-export const Route = createFileRoute("/_admin/partners")({
+export const Route = createFileRoute("/admin/partners")({
   head: () => ({
     meta: [
       { title: "Parceiros BET — PalazeHub Admin" },
