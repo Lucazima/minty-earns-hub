@@ -6,7 +6,7 @@ import { listPromoters, updatePromoterStatus } from "@/lib/admin.functions";
 import { Check, X, Search, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_admin/promoters/")({
+export const Route = createFileRoute("/admin/promoters/")({
   head: () => ({
     meta: [
       { title: "Promoters — PalazeHub Admin" },

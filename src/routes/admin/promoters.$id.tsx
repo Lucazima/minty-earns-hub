@@ -12,7 +12,7 @@ import { CountUp } from "@/components/CountUp";
 import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_admin/promoters/$id")({
+export const Route = createFileRoute("/admin/promoters/$id")({
   head: () => ({
     meta: [
       { title: "Detalhe do promoter — PalazeHub Admin" },

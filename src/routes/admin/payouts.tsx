@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 import { Check, X, Save } from "lucide-react";
 
-export const Route = createFileRoute("/_admin/payouts")({
+export const Route = createFileRoute("/admin/payouts")({
   head: () => ({
     meta: [
       { title: "Payouts — PalazeHub Admin" },
