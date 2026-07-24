@@ -92,6 +92,11 @@ function MinhaContaPage() {
     );
   }
 
+  const refreshProfile = () => {
+    qc.invalidateQueries({ queryKey: ["minha-conta-profile"] });
+    qc.invalidateQueries({ queryKey: ["me-avatar"] });
+  };
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -103,10 +108,10 @@ function MinhaContaPage() {
           </p>
         </header>
 
-        <AvatarSection profile={data.profile} avatarPreview={data.avatarPreview} userId={data.userId} onSaved={() => qc.invalidateQueries({ queryKey: ["me-profile"] })} />
-        <PersonalSection profile={data.profile} onSaved={() => qc.invalidateQueries({ queryKey: ["me-profile"] })} />
+        <AvatarSection profile={data.profile} avatarPreview={data.avatarPreview} userId={data.userId} onSaved={refreshProfile} />
+        <PersonalSection profile={data.profile} onSaved={refreshProfile} />
         <SecuritySection />
-        <SocialSection profile={data.profile} onSaved={() => qc.invalidateQueries({ queryKey: ["me-profile"] })} />
+        <SocialSection profile={data.profile} onSaved={refreshProfile} />
       </div>
     </AppShell>
   );
