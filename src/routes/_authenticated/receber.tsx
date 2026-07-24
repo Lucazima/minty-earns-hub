@@ -108,20 +108,63 @@ function Receber() {
         {step === 1 && (
           <section className="surface-card space-y-5 p-5 md:p-6">
             <div>
-              <label className="eyebrow" htmlFor="pix">Sua chave Pix</label>
+              <div className="flex items-baseline justify-between">
+                <label className="eyebrow" htmlFor="amount">Valor a sacar</label>
+                <span className="text-xs text-muted-foreground">
+                  Disponível:{" "}
+                  <span className="tabular font-semibold text-foreground">
+                    R$ {available.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </span>
+                </span>
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="font-display text-lg font-semibold text-muted-foreground">R$</span>
+                <input
+                  id="amount"
+                  inputMode="decimal"
+                  value={amountStr}
+                  onChange={(e) => setAmountStr(e.target.value.replace(/[^\d.,]/g, ""))}
+                  placeholder="0,00"
+                  className="w-full rounded-xl border border-border bg-background/60 px-4 py-3.5 font-display text-lg font-semibold text-foreground tabular outline-none focus:border-primary/60"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAmountStr(
+                      available.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    )
+                  }
+                  className="whitespace-nowrap rounded-xl border border-border bg-transparent px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:text-foreground"
+                >
+                  Sacar tudo
+                </button>
+              </div>
+              {amount > 0 && amount > available && (
+                <p className="mt-2 text-xs text-destructive">Valor acima do disponível.</p>
+              )}
+            </div>
+
+            <div>
+              <label className="eyebrow" htmlFor="cpf">Seu CPF (chave Pix)</label>
               <input
-                id="pix"
-                value={pixKey}
-                onChange={(e) => setPixKey(e.target.value)}
-                placeholder="CPF, e-mail, telefone ou chave aleatória"
-                className="mt-2 w-full rounded-xl border border-border bg-background/60 px-4 py-3.5 font-display text-lg font-semibold text-foreground outline-none focus:border-primary/60"
+                id="cpf"
+                inputMode="numeric"
+                value={cpf}
+                onChange={(e) => setCpf(formatCPF(e.target.value))}
+                placeholder="000.000.000-00"
+                className="mt-2 w-full rounded-xl border border-border bg-background/60 px-4 py-3.5 font-display text-lg font-semibold text-foreground tabular outline-none focus:border-primary/60"
               />
               <p className="mt-2 text-xs text-muted-foreground">
-                A gente guarda pra próxima vez ser mais rápido.
+                O saque só cai em conta com o seu CPF cadastrado como chave Pix.
               </p>
             </div>
             <button
-              onClick={() => pixKey.trim() ? setStep(2) : toast.error("Preencha sua chave Pix.")}
+              onClick={() => {
+                if (amount <= 0) return toast.error("Digite o valor que quer sacar.");
+                if (amount > available) return toast.error("Valor acima do disponível.");
+                if (!isValidCPF(cpf)) return toast.error("Digite seu CPF completo (11 dígitos).");
+                setStep(2);
+              }}
               disabled={available <= 0 || isLoading}
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
             >
@@ -134,8 +177,8 @@ function Receber() {
           <section className="surface-card space-y-5 p-5 md:p-6">
             <h2 className="font-display text-lg font-semibold">Confere se está tudo certo</h2>
             <dl className="space-y-3 text-sm">
-              <Row label="Valor" value={`R$ ${available.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`} strong />
-              <Row label="Para a chave Pix" value={pixKey} />
+              <Row label="Valor" value={`R$ ${amount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`} strong />
+              <Row label="Para o CPF" value={cpf} />
               <Row label="Chega em" value="Alguns segundos" />
               <Row label="Taxa" value="Sem taxa" />
             </dl>
@@ -165,7 +208,7 @@ function Receber() {
             </div>
             <h2 className="font-display mt-5 text-2xl font-semibold">Enviado.</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Seu saque de R$ {available.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} está a caminho da chave {pixKey}.
+              Seu saque de R$ {amount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} está a caminho do CPF {cpf}.
             </p>
             <Link
               to="/"
