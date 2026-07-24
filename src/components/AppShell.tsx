@@ -1,6 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
-import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck, Building2, LogOut } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck, Building2, LogOut, UserCircle } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -11,7 +12,32 @@ const nav = [
   { to: "/link", label: "Meu link", icon: LinkIcon },
   { to: "/extrato", label: "Extrato", icon: Receipt },
   { to: "/receber", label: "Receber", icon: Wallet },
+  { to: "/minha-conta", label: "Minha conta", icon: UserCircle },
 ] as const;
+
+function useMyAvatar() {
+  return useQuery({
+    queryKey: ["me-profile"],
+    queryFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+      if (!user) return { name: null as string | null, url: null as string | null };
+      const { data: p } = await supabase.from("profiles").select("display_name, avatar_url").eq("user_id", user.id).maybeSingle();
+      const prof = p as { display_name?: string | null; avatar_url?: string | null } | null;
+      let url: string | null = null;
+      const path = prof?.avatar_url ?? null;
+      if (path) {
+        if (path.startsWith("http")) url = path;
+        else {
+          const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+          url = signed?.signedUrl ?? null;
+        }
+      }
+      return { name: prof?.display_name ?? user.email ?? null, url };
+    },
+    staleTime: 60_000,
+  });
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
