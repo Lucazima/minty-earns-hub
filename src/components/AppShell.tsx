@@ -43,6 +43,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const { theme, toggleTheme, isNewPromoter, setIsNewPromoter } = useApp();
+  const { data: me } = useMyAvatar();
+  const initials = (me?.name ?? "?")
+    .split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "?";
 
   async function signOut() {
     await supabase.auth.signOut();
