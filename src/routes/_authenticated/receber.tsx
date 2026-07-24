@@ -17,28 +17,53 @@ export const Route = createFileRoute("/_authenticated/receber")({
   component: Receber,
 });
 
+function formatCPF(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  return d
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+function isValidCPF(v: string) {
+  return v.replace(/\D/g, "").length === 11;
+}
+function parseAmount(v: string) {
+  const n = Number(v.replace(/\./g, "").replace(",", "."));
+  return isFinite(n) ? n : 0;
+}
+
 function Receber() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["dashboard"], queryFn: loadDashboard });
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [pixKey, setPixKey] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [amountStr, setAmountStr] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Initialize pix key from profile once loaded
-  if (data && pixKey === "" && data.profile.pix_key) {
-    setPixKey(data.profile.pix_key);
+  // Initialize CPF from profile once loaded (only if the stored pix_key looks like a CPF)
+  if (data && cpf === "" && data.profile.pix_key && /^\d{11}$/.test(data.profile.pix_key.replace(/\D/g, ""))) {
+    setCpf(formatCPF(data.profile.pix_key));
   }
 
   const available = data?.available ?? 0;
+  const amount = parseAmount(amountStr);
 
   async function confirm() {
     if (available <= 0) {
       toast.error("Sem saldo disponível pra sacar agora.");
       return;
     }
+    if (amount <= 0 || amount > available) {
+      toast.error("Valor inválido. Use um valor até o disponível.");
+      return;
+    }
+    if (!isValidCPF(cpf)) {
+      toast.error("CPF inválido. Digite os 11 dígitos.");
+      return;
+    }
     setSubmitting(true);
     try {
-      await requestWithdrawal(available, pixKey);
+      await requestWithdrawal(amount, cpf.replace(/\D/g, ""));
       await qc.invalidateQueries({ queryKey: ["dashboard"] });
       await qc.invalidateQueries({ queryKey: ["withdrawals"] });
       setStep(3);
