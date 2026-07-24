@@ -62,9 +62,21 @@ function MinhaContaPage() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (error) throw error;
-      const p = (profile ?? { user_id: user.id }) as unknown as Profile;
-      const signed = await loadAvatarUrl(p.avatar_url);
-      return { profile: { ...p, email: p.email ?? user.email ?? null }, avatarPreview: signed, userId: user.id };
+      const raw = (profile ?? {}) as Record<string, unknown>;
+      const full: Profile = {
+        user_id: user.id,
+        display_name: (raw.display_name as string | null) ?? null,
+        email: (raw.email as string | null) ?? user.email ?? null,
+        avatar_url: (raw.avatar_url as string | null) ?? null,
+        phone: (raw.phone as string | null) ?? null,
+        instagram: (raw.instagram as string | null) ?? null,
+        facebook: (raw.facebook as string | null) ?? null,
+        twitter: (raw.twitter as string | null) ?? null,
+        threads: (raw.threads as string | null) ?? null,
+        telegram: (raw.telegram as string | null) ?? null,
+      };
+      const signed = await loadAvatarUrl(full.avatar_url);
+      return { profile: full, avatarPreview: signed, userId: user.id };
     },
   });
 
