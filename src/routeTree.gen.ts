@@ -25,6 +25,7 @@ import { Route as ParceiroDepositosRouteImport } from './routes/parceiro.deposit
 import { Route as AdminPayoutsRouteImport } from './routes/admin/payouts'
 import { Route as AdminPartnersRouteImport } from './routes/admin/partners'
 import { Route as AuthenticatedReceberRouteImport } from './routes/_authenticated/receber'
+import { Route as AuthenticatedMinhaContaRouteImport } from './routes/_authenticated/minha-conta'
 import { Route as AuthenticatedExtratoRouteImport } from './routes/_authenticated/extrato'
 import { Route as ParceiroPromotoresIndexRouteImport } from './routes/parceiro.promotores.index'
 import { Route as AdminPromotersIndexRouteImport } from './routes/admin/promoters.index'
@@ -112,6 +113,11 @@ const AuthenticatedReceberRoute = AuthenticatedReceberRouteImport.update({
   path: '/receber',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMinhaContaRoute = AuthenticatedMinhaContaRouteImport.update({
+  id: '/minha-conta',
+  path: '/minha-conta',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedExtratoRoute = AuthenticatedExtratoRouteImport.update({
   id: '/extrato',
   path: '/extrato',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/parceiro': typeof ParceiroRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/extrato': typeof AuthenticatedExtratoRoute
+  '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/receber': typeof AuthenticatedReceberRoute
   '/admin/partners': typeof AdminPartnersRoute
   '/admin/payouts': typeof AdminPayoutsRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/extrato': typeof AuthenticatedExtratoRoute
+  '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/receber': typeof AuthenticatedReceberRoute
   '/admin/partners': typeof AdminPartnersRoute
   '/admin/payouts': typeof AdminPayoutsRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/parceiro': typeof ParceiroRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/extrato': typeof AuthenticatedExtratoRoute
+  '/_authenticated/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/_authenticated/receber': typeof AuthenticatedReceberRoute
   '/admin/partners': typeof AdminPartnersRoute
   '/admin/payouts': typeof AdminPayoutsRoute
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/parceiro'
     | '/sitemap.xml'
     | '/extrato'
+    | '/minha-conta'
     | '/receber'
     | '/admin/partners'
     | '/admin/payouts'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/sitemap.xml'
     | '/extrato'
+    | '/minha-conta'
     | '/receber'
     | '/admin/partners'
     | '/admin/payouts'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/parceiro'
     | '/sitemap.xml'
     | '/_authenticated/extrato'
+    | '/_authenticated/minha-conta'
     | '/_authenticated/receber'
     | '/admin/partners'
     | '/admin/payouts'
@@ -416,6 +428,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReceberRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/minha-conta': {
+      id: '/_authenticated/minha-conta'
+      path: '/minha-conta'
+      fullPath: '/minha-conta'
+      preLoaderRoute: typeof AuthenticatedMinhaContaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/extrato': {
       id: '/_authenticated/extrato'
       path: '/extrato'
@@ -470,12 +489,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedExtratoRoute: typeof AuthenticatedExtratoRoute
+  AuthenticatedMinhaContaRoute: typeof AuthenticatedMinhaContaRoute
   AuthenticatedReceberRoute: typeof AuthenticatedReceberRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedExtratoRoute: AuthenticatedExtratoRoute,
+  AuthenticatedMinhaContaRoute: AuthenticatedMinhaContaRoute,
   AuthenticatedReceberRoute: AuthenticatedReceberRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }

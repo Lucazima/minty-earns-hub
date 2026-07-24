@@ -1,6 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
-import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck, Building2, LogOut } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Home, LinkIcon, Receipt, Wallet, Sparkles, Sun, Moon, UserPlus, UserCheck, Building2, LogOut, UserCircle } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -11,12 +12,40 @@ const nav = [
   { to: "/link", label: "Meu link", icon: LinkIcon },
   { to: "/extrato", label: "Extrato", icon: Receipt },
   { to: "/receber", label: "Receber", icon: Wallet },
+  { to: "/minha-conta", label: "Minha conta", icon: UserCircle },
 ] as const;
+
+function useMyAvatar() {
+  return useQuery({
+    queryKey: ["me-profile"],
+    queryFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+      if (!user) return { name: null as string | null, url: null as string | null };
+      const { data: p } = await supabase.from("profiles").select("display_name, avatar_url").eq("user_id", user.id).maybeSingle();
+      const prof = p as { display_name?: string | null; avatar_url?: string | null } | null;
+      let url: string | null = null;
+      const path = prof?.avatar_url ?? null;
+      if (path) {
+        if (path.startsWith("http")) url = path;
+        else {
+          const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+          url = signed?.signedUrl ?? null;
+        }
+      }
+      return { name: prof?.display_name ?? user.email ?? null, url };
+    },
+    staleTime: 60_000,
+  });
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const { theme, toggleTheme, isNewPromoter, setIsNewPromoter } = useApp();
+  const { data: me } = useMyAvatar();
+  const initials = (me?.name ?? "?")
+    .split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "?";
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -71,9 +100,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <LogOut className="h-4 w-4" strokeWidth={2} />
             </button>
-            <div className="hidden h-9 w-9 place-items-center rounded-full bg-secondary/20 text-sm font-semibold text-secondary md:grid">
-              M
-            </div>
+            <Link to="/minha-conta" aria-label="Minha conta" title="Minha conta" className="hidden h-9 w-9 overflow-hidden rounded-full border border-border/60 bg-secondary/20 md:block">
+              {me?.url ? (
+                <img src={me.url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="grid h-full w-full place-items-center text-sm font-semibold text-secondary">{initials}</span>
+              )}
+            </Link>
           </div>
         </div>
 
@@ -111,7 +144,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Mobile bottom nav */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4 px-2 py-2">
+        <div className="mx-auto grid max-w-md grid-cols-5 px-2 py-2">
           {nav.map((item) => {
             const active = pathname === item.to;
             const Icon = item.icon;
