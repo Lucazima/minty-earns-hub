@@ -48,6 +48,21 @@ function initials(name: string | null | undefined) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 }
 
+function emptyProfile(userId: string | null | undefined, email?: string | null): Profile {
+  return {
+    user_id: userId ?? "",
+    display_name: null,
+    email: email ?? null,
+    avatar_url: null,
+    phone: null,
+    instagram: null,
+    facebook: null,
+    twitter: null,
+    threads: null,
+    telegram: null,
+  };
+}
+
 function MinhaContaPage() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -96,6 +111,7 @@ function MinhaContaPage() {
     qc.invalidateQueries({ queryKey: ["minha-conta-profile"] });
     qc.invalidateQueries({ queryKey: ["me-avatar"] });
   };
+  const profile = data.profile ?? emptyProfile(data.userId);
 
   return (
     <AppShell>
@@ -108,10 +124,10 @@ function MinhaContaPage() {
           </p>
         </header>
 
-        <AvatarSection profile={data.profile} avatarPreview={data.avatarPreview} userId={data.userId} onSaved={refreshProfile} />
-        <PersonalSection profile={data.profile} onSaved={refreshProfile} />
+        <AvatarSection profile={profile} avatarPreview={data.avatarPreview ?? null} userId={data.userId ?? profile.user_id} onSaved={refreshProfile} />
+        <PersonalSection profile={profile} onSaved={refreshProfile} />
         <SecuritySection />
-        <SocialSection profile={data.profile} onSaved={refreshProfile} />
+        <SocialSection profile={profile} onSaved={refreshProfile} />
       </div>
     </AppShell>
   );
