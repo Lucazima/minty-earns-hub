@@ -17,7 +17,7 @@ const nav = [
 
 function useMyAvatar() {
   return useQuery({
-    queryKey: ["me-profile"],
+    queryKey: ["me-avatar"],
     queryFn: async () => {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
