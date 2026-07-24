@@ -100,9 +100,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <LogOut className="h-4 w-4" strokeWidth={2} />
             </button>
-            <div className="hidden h-9 w-9 place-items-center rounded-full bg-secondary/20 text-sm font-semibold text-secondary md:grid">
-              M
-            </div>
+            <Link to="/minha-conta" aria-label="Minha conta" title="Minha conta" className="hidden h-9 w-9 overflow-hidden rounded-full border border-border/60 bg-secondary/20 md:block">
+              {me?.url ? (
+                <img src={me.url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="grid h-full w-full place-items-center text-sm font-semibold text-secondary">{initials}</span>
+              )}
+            </Link>
           </div>
         </div>
 
