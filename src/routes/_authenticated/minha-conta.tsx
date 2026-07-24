@@ -51,7 +51,7 @@ function initials(name: string | null | undefined) {
 function MinhaContaPage() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
-    queryKey: ["me-profile"],
+    queryKey: ["minha-conta-profile"],
     queryFn: async () => {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
