@@ -167,37 +167,58 @@ export type Database = {
       profiles: {
         Row: {
           admin_notes: string
+          avatar_url: string | null
           created_at: string
           display_name: string
           email: string | null
+          facebook: string | null
+          instagram: string | null
+          phone: string | null
           pix_key: string | null
           referral_code: string
           status: Database["public"]["Enums"]["promoter_status"]
+          telegram: string | null
+          threads: string | null
           tier: Database["public"]["Enums"]["commission_tier"]
+          twitter: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           admin_notes?: string
+          avatar_url?: string | null
           created_at?: string
           display_name?: string
           email?: string | null
+          facebook?: string | null
+          instagram?: string | null
+          phone?: string | null
           pix_key?: string | null
           referral_code: string
           status?: Database["public"]["Enums"]["promoter_status"]
+          telegram?: string | null
+          threads?: string | null
           tier?: Database["public"]["Enums"]["commission_tier"]
+          twitter?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           admin_notes?: string
+          avatar_url?: string | null
           created_at?: string
           display_name?: string
           email?: string | null
+          facebook?: string | null
+          instagram?: string | null
+          phone?: string | null
           pix_key?: string | null
           referral_code?: string
           status?: Database["public"]["Enums"]["promoter_status"]
+          telegram?: string | null
+          threads?: string | null
           tier?: Database["public"]["Enums"]["commission_tier"]
+          twitter?: string | null
           updated_at?: string
           user_id?: string
         }
