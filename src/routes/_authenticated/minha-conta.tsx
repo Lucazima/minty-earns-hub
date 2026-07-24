@@ -48,10 +48,25 @@ function initials(name: string | null | undefined) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 }
 
+function emptyProfile(userId: string | null | undefined, email?: string | null): Profile {
+  return {
+    user_id: userId ?? "",
+    display_name: null,
+    email: email ?? null,
+    avatar_url: null,
+    phone: null,
+    instagram: null,
+    facebook: null,
+    twitter: null,
+    threads: null,
+    telegram: null,
+  };
+}
+
 function MinhaContaPage() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
-    queryKey: ["me-profile"],
+    queryKey: ["minha-conta-profile"],
     queryFn: async () => {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
@@ -92,6 +107,12 @@ function MinhaContaPage() {
     );
   }
 
+  const refreshProfile = () => {
+    qc.invalidateQueries({ queryKey: ["minha-conta-profile"] });
+    qc.invalidateQueries({ queryKey: ["me-avatar"] });
+  };
+  const profile = data.profile ?? emptyProfile(data.userId);
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -103,10 +124,10 @@ function MinhaContaPage() {
           </p>
         </header>
 
-        <AvatarSection profile={data.profile} avatarPreview={data.avatarPreview} userId={data.userId} onSaved={() => qc.invalidateQueries({ queryKey: ["me-profile"] })} />
-        <PersonalSection profile={data.profile} onSaved={() => qc.invalidateQueries({ queryKey: ["me-profile"] })} />
+        <AvatarSection profile={profile} avatarPreview={data.avatarPreview ?? null} userId={data.userId ?? profile.user_id} onSaved={refreshProfile} />
+        <PersonalSection profile={profile} onSaved={refreshProfile} />
         <SecuritySection />
-        <SocialSection profile={data.profile} onSaved={() => qc.invalidateQueries({ queryKey: ["me-profile"] })} />
+        <SocialSection profile={profile} onSaved={refreshProfile} />
       </div>
     </AppShell>
   );
